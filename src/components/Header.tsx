@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 const Header: React.FC = () => {
   const navigate = useNavigate();
   const userName = localStorage.getItem("userName");
+  const userImage = localStorage.getItem("userImage") || "/image/avatar.png"; // 기본 이미지
 
   return (
     <header className="flex justify-between items-center p-4 bg-white shadow">
@@ -15,8 +16,15 @@ const Header: React.FC = () => {
         <button className="hover:underline">기타</button>
       </nav>
       <div className="flex items-center space-x-4">
-        <img src="/image/avatar.png" alt="Profile" className="w-8 h-8 rounded-full object-cover border" />
-        <span className="font-semibold">{userName || "User"}</span>
+        <img
+          src={userImage}
+          alt="Profile"
+          className="w-8 h-8 rounded-full object-cover border cursor-pointer"
+          onClick={() => navigate("/profile")}
+        />
+        <span className="font-semibold cursor-pointer" onClick={() => navigate("/profile")}>
+          {userName || "User"}
+        </span>
         <button
           onClick={() => {
             localStorage.clear();

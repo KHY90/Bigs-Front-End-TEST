@@ -6,6 +6,7 @@ import Main from "../pages/Board";
 import PostPage from "../pages/PostPage";
 import DetailPage from "../pages/DetailPage";
 import EditPage from "../pages/EditPage";
+import ProfilePage from "../pages/Profile";
 
 const AppRoutes: React.FC = () => {
   return (
@@ -17,6 +18,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/write" element={<PostPage />} />
       <Route path="/detail/:id" element={<DetailPage />} /> 
       <Route path="/edit/:id" element={<EditPage />} /> 
+      <Route path="/profile" element={<ProfilePage />} /> 
       <Route path="*" element={<Navigate to="/signin" />} />
     </Routes>
   );
