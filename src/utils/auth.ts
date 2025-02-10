@@ -19,8 +19,6 @@ export const clearTokens = () => {
 export const refreshAccessToken = async (): Promise<string | null> => {
   const refreshToken = getRefreshToken();
   
-  console.log("🔍 현재 리프레시 토큰:", refreshToken); // ✅ 현재 저장된 리프레시 토큰 확인
-
   if (!refreshToken) {
     console.error("🚨 리프레시 토큰 없음");
     clearTokens();
@@ -41,8 +39,8 @@ export const refreshAccessToken = async (): Promise<string | null> => {
 
     const { accessToken: newAccessToken, refreshToken: newRefreshToken } = response.data;
     if (newAccessToken && newRefreshToken) {
-      console.log("✅ 토큰 갱신 성공! 새 액세스 토큰:", newAccessToken);
-      storeTokens(newAccessToken, newRefreshToken); // 🔹 새로운 리프레시 토큰도 저장!
+      // console.log("✅ 토큰 갱신 성공! 새 액세스 토큰:", newAccessToken);
+      storeTokens(newAccessToken, newRefreshToken); 
       return newAccessToken;
     }
   } catch (error) {

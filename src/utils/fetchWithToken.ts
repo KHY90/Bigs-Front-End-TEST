@@ -29,12 +29,11 @@ export const fetchWithToken = async (url: string, config: AxiosRequestConfig = {
         try {
           console.log("✅ 토큰 갱신 성공, 재요청 진행");
           
-          // 🔹 리프레시 후 `token`을 다시 가져오도록 수정!
           return await axios({
             url,
             method: config.method || "GET",
             headers: {
-              Authorization: `Bearer ${getAccessToken()}`, // ✅ 최신 토큰 사용
+              Authorization: `Bearer ${getAccessToken()}`,
               ...config.headers,
             },
             ...config,

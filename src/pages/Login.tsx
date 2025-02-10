@@ -30,8 +30,8 @@ const Login: React.FC = () => {
       const decodedToken = jwtDecode<DecodedToken>(accessToken);
       localStorage.setItem("userName", decodedToken.name);
   
-      console.log("✅ 로그인 성공, 토큰 저장!");
-      storeTokens(accessToken, refreshToken); // 🔹 리프레시 토큰 저장 확인!
+      // console.log("✅ 로그인 성공, 토큰 저장!");
+      storeTokens(accessToken, refreshToken);
   
       navigate("/main");
     } catch (error) {

@@ -15,7 +15,7 @@ interface BlogDetail {
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 
 const DetailPage: React.FC = () => {
-  const { id } = useParams<{ id: string }>(); // URL에서 게시글 ID 가져오기
+  const { id } = useParams<{ id: string }>();
   const [post, setPost] = useState<BlogDetail | null>(null);
   const navigate = useNavigate();
 
@@ -46,7 +46,20 @@ const DetailPage: React.FC = () => {
       ? post.imageUrl 
       : `${BASE_URL}${post.imageUrl}`
     : "/image/default-image.png";
-    
+
+  const handleDelete = async () => {
+    if (!window.confirm("정말 이 게시글을 삭제하시겠습니까?")) return;
+
+    try {
+      await fetchWithToken(`/api/boards/${id}`, { method: "DELETE" });
+      alert("게시글이 삭제되었습니다.");
+      navigate("/main");
+    } catch (error) {
+      console.error("게시글 삭제 실패:", error);
+      alert("게시글 삭제 중 오류가 발생했습니다.");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       <Header />
@@ -63,9 +76,26 @@ const DetailPage: React.FC = () => {
 
         <p className="text-gray-700 whitespace-pre-wrap">{post.content}</p>
 
-        <button onClick={() => navigate("/main")} className="mt-6 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">
-          🔙 뒤로 가기
-        </button>
+        {/* 버튼 그룹 */}
+        <div className="flex justify-between mt-6">
+          <button onClick={() => navigate("/main")} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">
+            🔙 뒤로 가기
+          </button>
+          <div className="space-x-2">
+            <button
+              onClick={() => navigate(`/edit/${id}`)}
+              className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition"
+            >
+              ✏️ 수정
+            </button>
+            <button
+              onClick={handleDelete}
+              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
+            >
+              🗑 삭제
+            </button>
+          </div>
+        </div>
       </main>
     </div>
   );
