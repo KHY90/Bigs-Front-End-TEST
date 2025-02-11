@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { fetchWithToken } from "../utils/fetchWithToken";
+import axios from "axios";
+import authStore from "../stores/authStore";
+import { observer } from "mobx-react-lite";
 
 interface BlogDetail {
   id: number;
@@ -9,11 +11,12 @@ interface BlogDetail {
   boardCategory: string;
   imageUrl?: string;
   createdAt: string;
+  author: string;
 }
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 
-const DetailPage: React.FC = () => {
+const DetailPage: React.FC = observer(() => {
   const { id } = useParams<{ id: string }>();
   const [post, setPost] = useState<BlogDetail | null>(null);
   const navigate = useNavigate();
@@ -21,9 +24,10 @@ const DetailPage: React.FC = () => {
   useEffect(() => {
     const fetchPostDetail = async () => {
       try {
-        const data = await fetchWithToken(`/api/boards/${id}`);
-        console.log("게시글 상세 정보:", data);
-        setPost(data);
+        const response = await axios.get(`/api/boards/${id}`, {
+          headers: { Authorization: `Bearer ${authStore.accessToken}` },
+        });
+        setPost(response.data);
       } catch (error) {
         console.error("게시글 상세 불러오기 실패:", error);
       }
@@ -50,7 +54,9 @@ const DetailPage: React.FC = () => {
     if (!window.confirm("정말 이 게시글을 삭제하시겠습니까?")) return;
 
     try {
-      await fetchWithToken(`/api/boards/${id}`, { method: "DELETE" });
+      await axios.delete(`/api/boards/${id}`, {
+        headers: { Authorization: `Bearer ${authStore.accessToken}` },
+      });
       alert("게시글이 삭제되었습니다.");
       navigate("/main");
     } catch (error) {
@@ -61,7 +67,6 @@ const DetailPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-
       <main className="max-w-3xl mx-auto mt-6 p-6 bg-white shadow rounded">
         <h1 className="text-3xl font-bold mb-4">{post.title}</h1>
         <p className="text-gray-500 mb-4">{post.boardCategory} · {new Date(post.createdAt).toLocaleDateString()}</p>
@@ -74,10 +79,12 @@ const DetailPage: React.FC = () => {
 
         <p className="text-gray-700 whitespace-pre-wrap">{post.content}</p>
 
-        {/* 버튼 그룹 */}
         <div className="flex justify-between mt-6">
-          <button onClick={() => navigate("/main")} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">
-            🔙 뒤로 가기
+          <button
+            onClick={() => navigate("/main")}
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
+          >
+            뒤로 가기
           </button>
           <div className="space-x-2">
             <button
@@ -97,6 +104,6 @@ const DetailPage: React.FC = () => {
       </main>
     </div>
   );
-};
+});
 
 export default DetailPage;

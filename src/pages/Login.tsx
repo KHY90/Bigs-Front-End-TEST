@@ -2,14 +2,15 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import { storeTokens } from "../utils/auth";
+import { observer } from "mobx-react-lite";
+import authStore from "../stores/authStore";
 
 interface DecodedToken {
   name: string;
   exp: number;
 }
 
-const Login: React.FC = () => {
+const Login: React.FC = observer(() => {
   const navigate = useNavigate();
   const [form, setForm] = useState({ username: "", password: "" });
   const [loading, setLoading] = useState(false);
@@ -28,11 +29,9 @@ const Login: React.FC = () => {
       if (!accessToken || !refreshToken) throw new Error("토큰이 반환되지 않았습니다.");
   
       const decodedToken = jwtDecode<DecodedToken>(accessToken);
-      localStorage.setItem("userName", decodedToken.name);
-      localStorage.setItem("userEmail", form.username); 
-      // console.log("✅ 로그인 성공, 토큰 저장!");
-      storeTokens(accessToken, refreshToken);
-  
+
+      authStore.login(decodedToken.name, form.username, accessToken, refreshToken);
+
       navigate("/main");
     } catch (error) {
       console.error("로그인 실패:", error);
@@ -47,7 +46,6 @@ const Login: React.FC = () => {
       <form onSubmit={handleSubmit} className="w-full max-w-md bg-white p-8 rounded shadow-md">
         <h2 className="text-xl font-bold text-center mb-6">로그인</h2>
 
-        {/* 아이디 입력 */}
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-medium mb-1">아이디</label>
           <input
@@ -61,7 +59,6 @@ const Login: React.FC = () => {
           />
         </div>
 
-        {/* 비밀번호 입력 */}
         <div className="mb-6">
           <label className="block text-gray-700 text-sm font-medium mb-1">비밀번호</label>
           <input
@@ -75,7 +72,6 @@ const Login: React.FC = () => {
           />
         </div>
 
-        {/* 로그인 버튼 */}
         <button
           type="submit"
           className="w-full bg-blue-500 text-white py-3 rounded hover:bg-blue-600 transition disabled:opacity-50"
@@ -84,18 +80,14 @@ const Login: React.FC = () => {
           {loading ? "로그인 중..." : "로그인"}
         </button>
 
-        {/* 회원가입 */}
         <div className="flex justify-end mt-4 text-sm text-gray-600">
           <button type="button" onClick={() => navigate("/signup")} className="hover:underline">
             회원가입
           </button>
-          {/* <button type="button" onClick={() => navigate("/forgot-password")} className="hover:underline">
-            아이디/비밀번호 찾기
-          </button> */}
         </div>
       </form>
     </div>
   );
-};
+});
 
 export default Login;

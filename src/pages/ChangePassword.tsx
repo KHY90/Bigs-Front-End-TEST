@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchWithToken } from "../utils/fetchWithToken";
+import axios from "axios";
 import { validatePassword, validatePasswordMatch } from "../utils/validation";
+import authStore from "../stores/authStore";
+import { observer } from "mobx-react-lite";
 
-const ChangePassword: React.FC = () => {
+const ChangePassword: React.FC = observer(() => {
   const navigate = useNavigate();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -32,13 +34,19 @@ const ChangePassword: React.FC = () => {
     if (!confirmChange) return;
 
     try {
-      await fetchWithToken("/auth", {
-        method: "PATCH",
-        data: { currentPassword, newPassword },
-        headers: { "Content-Type": "application/json" },
-      });
+      await axios.patch(
+        "/auth",
+        { currentPassword, newPassword },
+        {
+          headers: {
+            Authorization: `Bearer ${authStore.accessToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       alert("비밀번호가 변경되었습니다. 다시 로그인해주세요.");
+      authStore.clearAuth();
       navigate("/signin");
     } catch (error) {
       console.error("비밀번호 변경 실패:", error);
@@ -53,7 +61,6 @@ const ChangePassword: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-
       <main className="max-w-3xl mx-auto mt-6 p-6 bg-white shadow rounded">
         <h1 className="text-2xl font-bold mb-4">비밀번호 변경</h1>
 
@@ -109,6 +116,6 @@ const ChangePassword: React.FC = () => {
       </main>
     </div>
   );
-};
+});
 
 export default ChangePassword;

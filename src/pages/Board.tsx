@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import Header from "../components/Header";
 import { fetchWithToken } from "../utils/fetchWithToken";
 
 interface BlogPost {
@@ -36,12 +35,11 @@ const Board: React.FC = () => {
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
   const navigate = useNavigate();
 
-  // 🔹 게시글 목록 불러오기
   const fetchPosts = useCallback(async () => {
     setLoading(true);
     try {
       const data = await fetchWithToken(`/api/boards?page=0&size=10`);
-      console.log("게시글 API 응답:", data);
+      // console.log("게시글 API 응답:", data);
       setPosts(data.content || []);
     } catch (error) {
       console.error("게시글 불러오기 실패:", error);
@@ -54,10 +52,8 @@ const Board: React.FC = () => {
     fetchPosts();
   }, [fetchPosts]);
 
-  // 🔹 최신 게시글 3개 가져오기
   const latestPosts = posts.slice(0, 3);
 
-  // 🔹 5초마다 최신 게시물 변경
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentBannerIndex((prevIndex) => (prevIndex + 1) % latestPosts.length);
@@ -65,7 +61,6 @@ const Board: React.FC = () => {
     return () => clearInterval(interval);
   }, [latestPosts]);
 
-  // 🔹 배너 화살표 이동 핸들러
   const handlePrevBanner = () => {
     setCurrentBannerIndex((prevIndex) => (prevIndex === 0 ? latestPosts.length - 1 : prevIndex - 1));
   };
@@ -74,7 +69,6 @@ const Board: React.FC = () => {
     setCurrentBannerIndex((prevIndex) => (prevIndex + 1) % latestPosts.length);
   };
 
-  // 🔹 카테고리별 게시글 정리 (최대 3개까지만 최신순)
   const categorizedPosts = posts.reduce((acc, post) => {
     acc[post.category] = acc[post.category] || [];
     if (acc[post.category].length < 3) acc[post.category].push(post);
