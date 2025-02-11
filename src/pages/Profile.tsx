@@ -21,7 +21,7 @@ const Profile: React.FC = () => {
 
   const handleUpdateProfile = () => {
     if (!newName.trim()) {
-      alert("⚠️ 이름을 입력해주세요.");
+      alert("이름을 입력해주세요.");
       return;
     }
 
