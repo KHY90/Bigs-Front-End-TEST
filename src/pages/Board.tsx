@@ -38,8 +38,7 @@ const Board: React.FC = () => {
   const fetchPosts = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await fetchWithToken(`/api/boards?page=0&size=10`);
-      // console.log("게시글 API 응답:", data);
+      const data = await fetchWithToken(`/api/boards?page=0&size=50`);
       setPosts(data.content || []);
     } catch (error) {
       console.error("게시글 불러오기 실패:", error);
@@ -52,21 +51,25 @@ const Board: React.FC = () => {
     fetchPosts();
   }, [fetchPosts]);
 
-  const latestPosts = posts.slice(0, 3);
+  // 🔹 카테고리별 최신 게시물 1개씩 가져오기
+  const latestPostsByCategory = Object.keys(categoryNames).map((categoryKey) => {
+    return posts.find((post) => post.category === categoryKey) || null;
+  });
 
+  // 🔹 슬라이드 자동 전환 (5초마다 변경)
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentBannerIndex((prevIndex) => (prevIndex + 1) % latestPosts.length);
+      setCurrentBannerIndex((prevIndex) => (prevIndex + 1) % latestPostsByCategory.length);
     }, 5000);
     return () => clearInterval(interval);
-  }, [latestPosts]);
+  }, [latestPostsByCategory]);
 
   const handlePrevBanner = () => {
-    setCurrentBannerIndex((prevIndex) => (prevIndex === 0 ? latestPosts.length - 1 : prevIndex - 1));
+    setCurrentBannerIndex((prevIndex) => (prevIndex === 0 ? latestPostsByCategory.length - 1 : prevIndex - 1));
   };
 
   const handleNextBanner = () => {
-    setCurrentBannerIndex((prevIndex) => (prevIndex + 1) % latestPosts.length);
+    setCurrentBannerIndex((prevIndex) => (prevIndex + 1) % latestPostsByCategory.length);
   };
 
   const categorizedPosts = posts.reduce((acc, post) => {
@@ -77,40 +80,43 @@ const Board: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-
-      <main className="max-w-5xl mx-auto mt-6">
-        {/* 🔹 최신 게시물 (배너) */}
-        <section className="relative bg-white shadow-lg rounded mb-8 h-56 flex items-center justify-center overflow-hidden">
-          {latestPosts.length > 0 && (
+      <main className="max-w-5xl mx-auto mt-4">
+        {/* 🔹 카테고리별 최신 게시물 (배너 슬라이드) */}
+        <section className="relative bg-white shadow-lg rounded mb-6 h-48 flex items-center justify-center overflow-hidden">
+          {latestPostsByCategory.length > 0 && (
             <>
-              {/* 🔹 배경 이미지가 있는 경우 */}
               <div
-                key={latestPosts[currentBannerIndex].id}
-                className="absolute inset-0 w-full h-full bg-cover bg-center transition-opacity duration-500"
+                key={currentBannerIndex}
+                className="absolute inset-0 w-full h-full bg-cover bg-center transition-opacity duration-500 flex flex-col justify-center items-center"
                 style={{
-                  backgroundImage: `url(${getFullImageUrl(latestPosts[currentBannerIndex].imageUrl)})`,
-                  backgroundSize: "contain",
-                  backgroundRepeat: "no-repeat",
+                  backgroundImage: `url(${getFullImageUrl(latestPostsByCategory[currentBannerIndex]?.imageUrl)})`,
+                  backgroundSize: "cover",
                   backgroundPosition: "center",
-                  filter: "brightness(80%)",
+                  filter: "brightness(70%)",
                 }}
-                onClick={() => navigate(`/detail/${latestPosts[currentBannerIndex].id}`)}
-              />
+                onClick={() => latestPostsByCategory[currentBannerIndex] && navigate(`/detail/${latestPostsByCategory[currentBannerIndex]!.id}`)}
+              >
+                <div className="relative text-white font-bold text-xl bg-black bg-opacity-50 px-4 py-2 rounded">
+                  {categoryNames[Object.keys(categoryNames)[currentBannerIndex]]}
+                </div>
+                {latestPostsByCategory[currentBannerIndex] ? (
+                  <div className="relative text-white text-lg font-semibold mt-2">
+                    {latestPostsByCategory[currentBannerIndex]!.title}
+                  </div>
+                ) : (
+                  <div className="relative text-gray-300 text-sm font-light mt-2">
+                    아직 등록된 게시물이 없습니다.
+                  </div>
+                )}
+              </div>
 
-              {/* 🔹 화살표 버튼 (검정 테두리 + 흰색 아이콘) */}
+              {/* 🔹 슬라이드 화살표 버튼 */}
               <button
                 onClick={handlePrevBanner}
                 className="absolute left-2 bg-white border-2 border-black p-2 rounded-full shadow-md hover:bg-gray-100 transition z-10"
               >
                 <img src="/icons/left-arrow.svg" alt="Previous" className="w-6 h-6 filter invert" />
               </button>
-
-              {/* 🔹 텍스트 (검정 테두리 + 흰색) */}
-              <div className="relative bg-black bg-opacity-60 px-6 py-2 rounded text-white text-2xl font-bold border-2 border-white z-10">
-                {latestPosts[currentBannerIndex].title}
-              </div>
-
-              {/* 🔹 화살표 버튼 */}
               <button
                 onClick={handleNextBanner}
                 className="absolute right-2 bg-white border-2 border-black p-2 rounded-full shadow-md hover:bg-gray-100 transition z-10"
@@ -124,22 +130,22 @@ const Board: React.FC = () => {
         {/* 🔹 카테고리별 게시물 */}
         <section className="bg-white p-6 rounded shadow">
           <h2 className="text-xl font-bold mb-4">블로그 글</h2>
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-2 gap-4">
             {Object.entries(categoryNames).map(([key, name]) => (
-              <div key={key} className="min-h-[280px]">
+              <div key={key} className="min-h-[220px]">
                 <h3 className="text-lg font-bold mb-2">{name}</h3>
                 {categorizedPosts[key]?.length ? (
                   categorizedPosts[key].map((post) => (
                     <div
                       key={post.id}
-                      className="bg-white p-4 border shadow rounded mb-3 cursor-pointer hover:bg-gray-100 transition"
+                      className="bg-white p-3 border shadow rounded mb-3 cursor-pointer hover:bg-gray-100 transition"
                       onClick={() => navigate(`/detail/${post.id}`)}
                     >
                       <h4 className="font-semibold">{post.title}</h4>
                       <p className="text-sm text-gray-500">
                         {post.author} · {new Date(post.createdAt).toLocaleDateString()}
                       </p>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-xs text-gray-600">
                         {post.content ? post.content.substring(0, 50) + "..." : ""}
                       </p>
                     </div>
