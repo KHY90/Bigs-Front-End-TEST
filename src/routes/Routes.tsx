@@ -7,20 +7,25 @@ import PostPage from "../pages/PostPage";
 import DetailPage from "../pages/DetailPage";
 import EditPage from "../pages/EditPage";
 import ProfilePage from "../pages/Profile";
+import ErrorPage from "../pages/Error";
+import ProtectedRoute from "../components/ProtectedRoute";
 
 const AppRoutes: React.FC = () => {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/signin" />} />
       <Route path="/signin" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />
-      <Route path="/main" element={<Main />} />
-      <Route path="/write" element={<PostPage />} />
-      <Route path="/detail/:id" element={<DetailPage />} /> 
-      <Route path="/edit/:id" element={<EditPage />} /> 
-      <Route path="/profile" element={<ProfilePage />} /> 
-      <Route path="*" element={<Navigate to="/signin" />} />
-    </Routes>
+
+      <Route element={<ProtectedRoute />}>
+        <Route path="/main" element={<Main />} />
+        <Route path="/write" element={<PostPage />} />
+        <Route path="/detail/:id" element={<DetailPage />} />
+        <Route path="/edit/:id" element={<EditPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+      </Route>
+
+      <Route path="/" element={<Navigate to="/signin" />} />
+      <Route path="*" element={<ErrorPage />} />    </Routes>
   );
 };
 
