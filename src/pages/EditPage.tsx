@@ -139,7 +139,7 @@ const EditPage: React.FC = observer(() => {
                     className="w-12 mx-auto mb-2 opacity-80"
                     onError={(e) => (e.currentTarget.src = "/image/default-upload.png")}
                   />
-                  <p className="text-gray-600">이미지를 드래그하여 업로드하거나 파일 선택</p>
+                  <p className="text-gray-600">이미지를 드래그하여 업로드하거나 파일 선택해 주세요.</p>
                 </>
               )}
             </label>

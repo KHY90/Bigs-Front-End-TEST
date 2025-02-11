@@ -122,6 +122,7 @@ const SignUp: React.FC = () => {
               required
             />
           </div>
+          <p className="text-xs text-gray-500 mt-1">8자 이상, 영문, 숫자, 특수문자를 포함해주세요.</p>
           {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
         </div>
 

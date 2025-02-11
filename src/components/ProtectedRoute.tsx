@@ -1,11 +1,10 @@
 import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import { getAccessToken } from "../utils/auth";
+import { observer } from "mobx-react-lite";
+import authStore from "../stores/authStore";
 
-const ProtectedRoute: React.FC = () => {
-  const isAuthenticated = !!getAccessToken();
-
-  return isAuthenticated ? <Outlet /> : <Navigate to="/signin" replace />;
-};
+const ProtectedRoute: React.FC = observer(() => {
+  return authStore.isAuthenticated ? <Outlet /> : <Navigate to="/signin" replace />;
+});
 
 export default ProtectedRoute;
