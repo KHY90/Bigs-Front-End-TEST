@@ -10,13 +10,13 @@ export default defineConfig({
         secure: false,
         rewrite: (path) => path.replace(/^\/auth/, "/auth"),
       },
-      "/api": {
-        target: "https://front-mission.bigs.or.kr",
-        changeOrigin: true,
-        secure: false,
-        rewrite: (path) => path.replace(/^\/api/, ""),
-      },
+    "/api": {
+      target: "https://front-mission.bigs.or.kr",
+      changeOrigin: true,
+      secure: false,
+      rewrite: (path) => path.replace(/^\/api/, ""),
     },
   },
+},
   plugins: [react()],
 });
