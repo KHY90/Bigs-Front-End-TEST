@@ -29,7 +29,7 @@ const Login: React.FC = () => {
   
       const decodedToken = jwtDecode<DecodedToken>(accessToken);
       localStorage.setItem("userName", decodedToken.name);
-  
+      localStorage.setItem("userEmail", form.username); 
       // console.log("✅ 로그인 성공, 토큰 저장!");
       storeTokens(accessToken, refreshToken);
   

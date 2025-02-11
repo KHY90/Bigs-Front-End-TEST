@@ -44,7 +44,7 @@ export const fetchWithToken = async (url: string, config: AxiosRequestConfig = {
         }
       } else {
         console.error("🚨 리프레시 토큰 만료, 로그아웃 진행");
-        clearTokens(); // ✅ 리프레시 토큰 만료일 때만 로그아웃
+        clearTokens(); 
       }
     }
     throw error;

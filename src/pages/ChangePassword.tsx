@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import { fetchWithToken } from "../utils/fetchWithToken";
+import { validatePassword, validatePasswordMatch } from "../utils/validation";
 
 const ChangePassword: React.FC = () => {
   const navigate = useNavigate();
@@ -10,7 +11,6 @@ const ChangePassword: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
 
-  // 🔹 비밀번호 변경 요청
   const handleChangePassword = async () => {
     setError("");
 
@@ -19,13 +19,21 @@ const ChangePassword: React.FC = () => {
       return;
     }
 
-    if (newPassword !== confirmPassword) {
+    if (!validatePassword(newPassword)) {
+      setError("비밀번호는 8자 이상, 영문, 숫자, 특수문자를 포함해야 합니다.");
+      return;
+    }
+
+    if (!validatePasswordMatch(newPassword, confirmPassword)) {
       setError("새 비밀번호가 일치하지 않습니다.");
       return;
     }
 
+    const confirmChange = window.confirm("비밀번호를 변경하시겠습니까?");
+    if (!confirmChange) return;
+
     try {
-      await fetchWithToken("/api/users/change-password", {
+      await fetchWithToken("/auth", {
         method: "PATCH",
         data: { currentPassword, newPassword },
         headers: { "Content-Type": "application/json" },
@@ -39,6 +47,11 @@ const ChangePassword: React.FC = () => {
     }
   };
 
+  const handleCancel = () => {
+    const confirmCancel = window.confirm("비밀번호 변경을 취소하시겠습니까?");
+    if (confirmCancel) navigate("/profile");
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       <Header />
@@ -48,7 +61,6 @@ const ChangePassword: React.FC = () => {
 
         {error && <p className="text-red-500 mb-4">{error}</p>}
 
-        {/* 🔹 현재 비밀번호 입력 */}
         <div className="mb-4">
           <label className="block text-gray-700">현재 비밀번호</label>
           <input
@@ -60,7 +72,6 @@ const ChangePassword: React.FC = () => {
           />
         </div>
 
-        {/* 🔹 새 비밀번호 입력 */}
         <div className="mb-4">
           <label className="block text-gray-700">새 비밀번호</label>
           <input
@@ -72,7 +83,6 @@ const ChangePassword: React.FC = () => {
           />
         </div>
 
-        {/* 🔹 새 비밀번호 확인 */}
         <div className="mb-4">
           <label className="block text-gray-700">새 비밀번호 확인</label>
           <input
@@ -84,7 +94,6 @@ const ChangePassword: React.FC = () => {
           />
         </div>
 
-        {/* 🔹 버튼 그룹 */}
         <div className="flex space-x-4">
           <button
             onClick={handleChangePassword}
@@ -93,7 +102,7 @@ const ChangePassword: React.FC = () => {
             변경하기
           </button>
           <button
-            onClick={() => navigate("/profile")}
+            onClick={handleCancel}
             className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400 transition"
           >
             취소
