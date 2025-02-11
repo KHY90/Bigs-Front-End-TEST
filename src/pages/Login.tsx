@@ -84,14 +84,14 @@ const Login: React.FC = () => {
           {loading ? "로그인 중..." : "로그인"}
         </button>
 
-        {/* 회원가입 & 아이디 찾기 */}
-        <div className="flex justify-between mt-4 text-sm text-gray-600">
+        {/* 회원가입 */}
+        <div className="flex justify-end mt-4 text-sm text-gray-600">
           <button type="button" onClick={() => navigate("/signup")} className="hover:underline">
             회원가입
           </button>
-          <button type="button" onClick={() => navigate("/forgot-password")} className="hover:underline">
+          {/* <button type="button" onClick={() => navigate("/forgot-password")} className="hover:underline">
             아이디/비밀번호 찾기
-          </button>
+          </button> */}
         </div>
       </form>
     </div>
