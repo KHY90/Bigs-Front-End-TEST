@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Header from "../components/Header";
 import { fetchWithToken } from "../utils/fetchWithToken";
 import { validatePassword, validatePasswordMatch } from "../utils/validation";
 
@@ -54,7 +53,6 @@ const ChangePassword: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <Header />
 
       <main className="max-w-3xl mx-auto mt-6 p-6 bg-white shadow rounded">
         <h1 className="text-2xl font-bold mb-4">비밀번호 변경</h1>

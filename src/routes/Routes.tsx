@@ -10,6 +10,7 @@ import ProfilePage from "../pages/Profile";
 import ErrorPage from "../pages/Error";
 import ChangePassword from "../pages/ChangePassword";
 import ProtectedRoute from "../components/ProtectedRoute";
+import Layout from "../components/Layout";
 
 const AppRoutes: React.FC = () => {
   return (
@@ -17,13 +18,15 @@ const AppRoutes: React.FC = () => {
       <Route path="/signin" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />
 
-      <Route element={<ProtectedRoute />}>
-        <Route path="/main" element={<Main />} />
-        <Route path="/write" element={<PostPage />} />
-        <Route path="/detail/:id" element={<DetailPage />} />
-        <Route path="/edit/:id" element={<EditPage />} />
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/change-password" element={<ChangePassword />} />
+      <Route element={<Layout />}>
+        <Route element={<ProtectedRoute />}>
+          <Route path="/main" element={<Main />} />
+          <Route path="/write" element={<PostPage />} />
+          <Route path="/detail/:id" element={<DetailPage />} />
+          <Route path="/edit/:id" element={<EditPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/change-password" element={<ChangePassword />} />
+        </Route>
       </Route>
 
       <Route path="/" element={<Navigate to="/signin" />} />

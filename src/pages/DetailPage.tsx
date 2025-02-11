@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import Header from "../components/Header";
 import { fetchWithToken } from "../utils/fetchWithToken";
 
 interface BlogDetail {
@@ -62,7 +61,6 @@ const DetailPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <Header />
 
       <main className="max-w-3xl mx-auto mt-6 p-6 bg-white shadow rounded">
         <h1 className="text-3xl font-bold mb-4">{post.title}</h1>

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Header from "../components/Header";
 import { fetchWithToken } from "../utils/fetchWithToken";
 
 const PostPage: React.FC = () => {
@@ -71,7 +70,6 @@ const PostPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <Header />
 
       {/* 글 작성 폼 */}
       <main className="max-w-3xl mx-auto mt-6">

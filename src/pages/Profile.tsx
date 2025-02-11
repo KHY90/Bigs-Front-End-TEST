@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Header from "../components/Header";
 
 const Profile: React.FC = () => {
   const navigate = useNavigate();
@@ -13,29 +12,36 @@ const Profile: React.FC = () => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
-      const imageUrl = URL.createObjectURL(file); // 로컬에서 이미지 미리보기
+      const imageUrl = URL.createObjectURL(file);
       setUserImage(imageUrl);
-      localStorage.setItem("userImage", imageUrl); // 로컬스토리지에 저장
+      localStorage.setItem("userImage", imageUrl);
       alert("프로필 이미지가 변경되었습니다!");
     }
   };
 
   const handleUpdateProfile = () => {
     if (!newName.trim()) {
-      alert("이름을 입력해주세요.");
+      alert("⚠️ 이름을 입력해주세요.");
       return;
     }
 
-    localStorage.setItem("userName", newName);
-    setUserName(newName);
-    setIsEditingName(false);
-    alert("이름이 변경되었습니다.");
+    if (window.confirm("이름을 변경하시겠습니까?")) {
+      localStorage.setItem("userName", newName);
+      setUserName(newName);
+      setIsEditingName(false);
+      alert("이름이 변경되었습니다.");
+    }
+  };
+
+  const handleCancelEdit = () => {
+    if (window.confirm("이름 변경을 취소하시겠습니까?")) {
+      setIsEditingName(false);
+      setNewName(userName);
+    }
   };
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <Header />
-
       <main className="max-w-3xl mx-auto mt-6 p-6 bg-white shadow rounded">
         <h1 className="text-2xl font-bold mb-4">프로필</h1>
 
@@ -64,7 +70,7 @@ const Profile: React.FC = () => {
                     저장
                   </button>
                   <button
-                    onClick={() => setIsEditingName(false)}
+                    onClick={handleCancelEdit}
                     className="bg-gray-300 px-3 py-1 rounded hover:bg-gray-400 w-full"
                   >
                     취소

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import Header from "../components/Header";
 import { fetchWithToken } from "../utils/fetchWithToken";
 
 const EditPage: React.FC = () => {
@@ -86,7 +85,6 @@ const EditPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <Header />
 
       <main className="max-w-3xl mx-auto mt-6">
         <h1 className="text-2xl font-bold mb-6">게시글 수정</h1>
