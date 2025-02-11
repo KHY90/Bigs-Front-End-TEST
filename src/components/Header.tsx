@@ -1,14 +1,28 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { observer } from "mobx-react-lite";
 import authStore from "../stores/authStore";
+import { fetchWithToken } from "../utils/fetchWithToken";
 
 const Header: React.FC = observer(() => {
   const navigate = useNavigate();
   const { userName, userImage, clearAuth } = authStore;
   const defaultImage = "/image/avatar.png";
 
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [categories, setCategories] = useState<{ [key: string]: string }>({});
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await fetchWithToken(`/api/boards/categories`);
+        setCategories(data);
+      } catch (error) {
+        console.error("카테고리 가져오기 실패:", error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const handleLogout = () => {
     if (window.confirm("정말 로그아웃 하시겠습니까?")) {
@@ -27,35 +41,15 @@ const Header: React.FC = observer(() => {
           onClick={() => navigate("/main")}
         />
         <nav className="flex space-x-6 text-gray-700">
-          <button className="hover:underline">공지</button>
-          <button className="hover:underline">자유</button>
-          <button className="hover:underline">Q&A</button>
-          <button className="hover:underline">기타</button>
+          {Object.entries(categories).map(([key, label]) => (
+            <button key={key} className="hover:underline" onClick={() => navigate(`/category/${key}`)}>
+              {label}
+            </button>
+          ))}
         </nav>
       </div>
 
       <div className="flex items-center space-x-4">
-        {/* 다크모드 스위치 */}
-        <label className="flex items-center cursor-pointer">
-          <input
-            type="checkbox"
-            className="hidden"
-            checked={isDarkMode}
-            onChange={() => setIsDarkMode(!isDarkMode)}
-          />
-          <div
-            className={`w-10 h-5 flex items-center bg-gray-300 rounded-full p-1 ${
-              isDarkMode ? "bg-gray-700" : "bg-gray-300"
-            }`}
-          >
-            <div
-              className={`w-4 h-4 bg-white rounded-full shadow-md transform duration-300 ${
-                isDarkMode ? "translate-x-5" : "translate-x-0"
-              }`}
-            ></div>
-          </div>
-        </label>
-
         <img
           src={userImage || defaultImage}
           alt="Profile"

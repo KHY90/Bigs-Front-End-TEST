@@ -9,6 +9,7 @@ import EditPage from "../pages/EditPage";
 import ProfilePage from "../pages/Profile";
 import ErrorPage from "../pages/Error";
 import ChangePassword from "../pages/ChangePassword";
+import CategoryPage from "../pages/CategoryPage";
 import ProtectedRoute from "../components/ProtectedRoute";
 import Layout from "../components/Layout";
 
@@ -26,11 +27,13 @@ const AppRoutes: React.FC = () => {
           <Route path="/edit/:id" element={<EditPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/change-password" element={<ChangePassword />} />
+          <Route path="/category/:category" element={<CategoryPage />} />
         </Route>
       </Route>
 
       <Route path="/" element={<Navigate to="/signin" />} />
-      <Route path="*" element={<ErrorPage />} />    </Routes>
+      <Route path="*" element={<ErrorPage />} />
+    </Routes>
   );
 };
 
