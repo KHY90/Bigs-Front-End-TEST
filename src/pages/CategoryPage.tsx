@@ -1,19 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { fetchWithToken } from "../utils/fetchWithToken";
-
-interface Post {
-  id: number;
-  title: string;
-  createdAt: string;
-}
+import { BlogPost } from "../types/types"; 
+import WriteButton from "../components/WriteButton";
+import Pagination from "../components/Pagination";
+import ScrapButton from "../components/ScrapButton";
+import { handleEdit, handleDelete } from "../utils/postActions";
 
 const POSTS_PER_PAGE = 6;
 
 const CategoryPage: React.FC = () => {
   const { category } = useParams<{ category: string }>();
   const navigate = useNavigate();
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<{ [key: string]: string }>({});
   const [currentPage, setCurrentPage] = useState(1);
@@ -51,7 +50,6 @@ const CategoryPage: React.FC = () => {
     fetchCategories();
   }, []);
 
-  // 페이지 네이션
   const totalPages = Math.max(1, Math.ceil(posts.length / POSTS_PER_PAGE));
   const displayedPosts = posts.slice((currentPage - 1) * POSTS_PER_PAGE, currentPage * POSTS_PER_PAGE);
 
@@ -69,51 +67,47 @@ const CategoryPage: React.FC = () => {
             {displayedPosts.map((post) => (
               <div
                 key={post.id}
-                className="bg-white p-3 rounded shadow cursor-pointer hover:bg-gray-50 transition flex flex-col justify-between h-[70px]"
+                className="bg-white p-3 rounded shadow cursor-pointer hover:bg-gray-50 transition flex justify-between items-center h-[70px]"
                 onClick={() => navigate(`/detail/${post.id}`)}
               >
-                <h2 className="font-semibold text-md truncate">{post.title}</h2>
-                <p className="text-xs text-gray-600">{new Date(post.createdAt).toLocaleDateString()}</p>
+                {/* 🔹 게시글 정보 */}
+                <div>
+                  <h2 className="font-semibold text-md truncate">{post.title}</h2>
+                  <p className="text-xs text-gray-600">{new Date(post.createdAt).toLocaleDateString()}</p>
+                </div>
+
+                {/* 🔹 버튼 그룹 */}
+                <div className="flex space-x-2">
+                  <ScrapButton postId={post.id} />
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation(); // 🔹 디테일 페이지 이동 방지
+                      handleEdit(post.id, navigate);
+                    }}
+                    className="text-yellow-500 hover:text-yellow-600"
+                  >
+                    ✏️
+                  </button>
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation(); // 🔹 디테일 페이지 이동 방지
+                      handleDelete(post.id, navigate);
+                    }}
+                    className="text-red-500 hover:text-red-600"
+                  >
+                    🗑
+                  </button>
+                </div>
               </div>
             ))}
           </div>
         )}
       </div>
 
-      <div className="mt-auto flex justify-center items-center space-x-2 pt-6">
-        <button
-          className={`px-3 py-1 border rounded ${currentPage === 1 ? "text-gray-400" : "text-black"}`}
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-        >
-          ◀ 이전
-        </button>
-
-        {Array.from({ length: totalPages }).map((_, index) => (
-          <button
-            key={index}
-            className={`px-3 py-1 border rounded ${currentPage === index + 1 ? "bg-black text-white" : "text-black"}`}
-            onClick={() => setCurrentPage(index + 1)}
-          >
-            {index + 1}
-          </button>
-        ))}
-
-        <button
-          className={`px-3 py-1 border rounded ${currentPage === totalPages ? "text-gray-400" : "text-black"}`}
-          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-          disabled={currentPage === totalPages}
-        >
-          다음 ▶
-        </button>
-      </div>
-
-      <button
-        className="fixed bottom-10 right-10 bg-black text-white px-5 py-3 rounded-full shadow-lg flex items-center hover:bg-gray-800"
-        onClick={() => navigate("/write")}
-      >
-        ✏️ 글쓰기
-      </button>
+      <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+      <WriteButton />
     </div>
   );
 };

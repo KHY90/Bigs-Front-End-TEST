@@ -48,7 +48,7 @@ const Login: React.FC = observer(() => {
         src="/image/bigslogo.png"
         alt="Logo"
         className="h-12 mb-4"
-        onError={(e) => (e.currentTarget.src = "/image/default-logo.png")} // 기본 로고 대체
+        onError={(e) => (e.currentTarget.src = "/image/bigslogo.png")}
       />
 
       <h2 className="text-2xl font-bold mb-1">빅스에 오신 것을 환영합니다</h2>

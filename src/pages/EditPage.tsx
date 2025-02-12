@@ -129,15 +129,15 @@ const EditPage: React.FC = observer(() => {
                   src={postStore.preview}
                   alt="미리보기"
                   className="w-40 h-40 object-cover rounded shadow border-2 border-gray-300"
-                  onError={(e) => (e.currentTarget.src = "/image/default-upload.png")}
+                  onError={(e) => (e.currentTarget.src = "/image/default.png")}
                 />
               ) : (
                 <>
                   <img
-                    src="/image/upload-icon.png"
+                    src="/image/default.png"
                     alt="Upload"
                     className="w-12 mx-auto mb-2 opacity-80"
-                    onError={(e) => (e.currentTarget.src = "/image/default-upload.png")}
+                    onError={(e) => (e.currentTarget.src = "/image/default.png")}
                   />
                   <p className="text-gray-600">이미지를 드래그하여 업로드하거나 파일 선택해 주세요.</p>
                 </>
