@@ -1,10 +1,10 @@
 import { makeAutoObservable, runInAction } from "mobx";
 
 class AuthStore {
-  userName: string = localStorage.getItem("userName") || "User";
-  userEmail: string = localStorage.getItem("userEmail") || "이메일 없음";
-  userImage: string = localStorage.getItem("userImage") || "/image/avatar.png";
-  accessToken: string | null = localStorage.getItem("accessToken");
+  userName: string = sessionStorage.getItem("userName") || "User";
+  userEmail: string = sessionStorage.getItem("userEmail") || "이메일 없음";
+  userImage: string = sessionStorage.getItem("userImage") || "/image/avatar.png";
+  accessToken: string | null = sessionStorage.getItem("accessToken");
   refreshToken: string | null = sessionStorage.getItem("refreshToken");
   isAuthenticated: boolean = !!this.accessToken;
 
@@ -22,9 +22,9 @@ class AuthStore {
       this.isAuthenticated = true;
     });
 
-    localStorage.setItem("userName", name);
-    localStorage.setItem("userEmail", email);
-    localStorage.setItem("accessToken", accessToken);
+    sessionStorage.setItem("userName", name);
+    sessionStorage.setItem("userEmail", email);
+    sessionStorage.setItem("accessToken", accessToken);
     sessionStorage.setItem("refreshToken", refreshToken);
   };
 
@@ -39,9 +39,9 @@ class AuthStore {
       this.isAuthenticated = false;
     });
 
-    localStorage.removeItem("userName");
-    localStorage.removeItem("userEmail");
-    localStorage.removeItem("accessToken");
+    sessionStorage.removeItem("userName");
+    sessionStorage.removeItem("userEmail");
+    sessionStorage.removeItem("accessToken");
     sessionStorage.removeItem("refreshToken");
   };
 
@@ -53,7 +53,7 @@ class AuthStore {
       this.isAuthenticated = true;
     });
 
-    localStorage.setItem("accessToken", accessToken);
+    sessionStorage.setItem("accessToken", accessToken);
     sessionStorage.setItem("refreshToken", refreshToken);
   };
 }

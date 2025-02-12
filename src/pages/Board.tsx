@@ -51,12 +51,10 @@ const Board: React.FC = () => {
     fetchPosts();
   }, [fetchPosts]);
 
-  // 🔹 카테고리별 최신 게시물 1개씩 가져오기
   const latestPostsByCategory = Object.keys(categoryNames).map((categoryKey) => {
     return posts.find((post) => post.category === categoryKey) || null;
   });
 
-  // 🔹 슬라이드 자동 전환 (5초마다 변경)
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentBannerIndex((prevIndex) => (prevIndex + 1) % latestPostsByCategory.length);
@@ -81,7 +79,6 @@ const Board: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-100">
       <main className="max-w-5xl mx-auto mt-4">
-        {/* 🔹 카테고리별 최신 게시물 (배너 슬라이드) */}
         <section className="relative bg-white shadow-lg rounded mb-6 h-48 flex items-center justify-center overflow-hidden">
           {latestPostsByCategory.length > 0 && (
             <>
