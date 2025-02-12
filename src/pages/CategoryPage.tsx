@@ -92,7 +92,7 @@ const CategoryPage: React.FC = () => {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleDelete(post.id, navigate);
+                      handleDelete(post.id, setPosts);
                     }}
                     className="text-red-500 hover:text-red-600"
                   >

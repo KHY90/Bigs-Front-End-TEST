@@ -1,22 +1,22 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchWithToken } from "../utils/fetchWithToken";
-import { BlogPost } from "../types/types"; 
-import WriteButton from "../components/WriteButton"; 
-import Banner from "../components/Banner"; 
+import { BlogPost } from "../types/types";
+import WriteButton from "../components/WriteButton";
+import Banner from "../components/Banner";
 import ScrapButton from "../components/ScrapButton";
 import { handleEdit, handleDelete } from "../utils/postActions";
 
 const categoryNames: Record<string, string> = {
   NOTICE: "공지",
   FREE: "자유",
-  "QNA": "Q&A",
+  QNA: "Q&A",
   ETC: "기타",
 };
 
 const Board: React.FC = () => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   const fetchPosts = useCallback(async () => {
@@ -66,7 +66,7 @@ const Board: React.FC = () => {
                         <div>
                           <h4 className="font-semibold">{post.title}</h4>
                           <p className="text-sm text-gray-500">
-                            {post.author}  {new Date(post.createdAt).toLocaleDateString()}
+                            {post.author} {new Date(post.createdAt).toLocaleDateString()}
                           </p>
                           <p className="text-xs text-gray-600">
                             {post.content ? post.content.substring(0, 50) + "..." : ""}
@@ -88,8 +88,8 @@ const Board: React.FC = () => {
 
                           <button
                             onClick={(e) => {
-                              e.stopPropagation(); 
-                              handleDelete(post.id, navigate);
+                              e.stopPropagation();
+                              handleDelete(post.id, setPosts);
                             }}
                             className="text-red-500 hover:text-red-600"
                           >
