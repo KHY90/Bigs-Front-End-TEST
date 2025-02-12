@@ -62,95 +62,95 @@ const SignUp: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4 sm:p-6">
       <img
         src="/image/bigslogo.png"
         alt="Logo"
-        className="h-12 mb-2"
+        className="h-12 mb-3 sm:mb-4"
         onError={(e) => (e.currentTarget.src = "/image/default-logo.png")}
       />
 
-      <h2 className="text-2xl font-bold mb-1">회원가입</h2>
-      <p className="text-gray-500 mb-6">새로운 계정을 만들어보세요</p>
+      <h2 className="text-xl sm:text-2xl font-bold mb-1">회원가입</h2>
+      <p className="text-gray-500 mb-6 text-sm sm:text-base">새로운 계정을 만들어보세요</p>
 
-      <form onSubmit={handleSubmit} className="w-full max-w-md bg-white p-8 rounded shadow-lg">
-        <div className="mb-4">
-          <label className="block text-gray-700">아이디</label>
+      <form onSubmit={handleSubmit} className="w-full max-w-sm sm:max-w-md bg-white p-6 sm:p-8 rounded shadow-lg">
+        <div className="mb-3 sm:mb-4">
+          <label className="block text-gray-700 text-sm sm:text-base">아이디</label>
           <div className="relative">
-            <span className="absolute inset-y-0 left-3 flex items-center text-gray-500">📧</span>
+            <span className="absolute inset-y-0 left-3 flex items-center text-gray-500 text-sm sm:text-base">📧</span>
             <input
               type="email"
               name="username"
               value={form.username}
               onChange={handleChange}
-              className="pl-10 w-full p-2 border border-gray-300 rounded"
+              className="pl-12 sm:pl-14 w-full p-2 sm:p-3 border border-gray-300 rounded text-sm sm:text-base"
               placeholder="이메일을 입력하세요"
               required
             />
           </div>
-          {errors.username && <p className="text-red-500 text-sm">{errors.username}</p>}
+          {errors.username && <p className="text-red-500 text-xs sm:text-sm">{errors.username}</p>}
         </div>
 
-        <div className="mb-4">
-          <label className="block text-gray-700">이름</label>
+        <div className="mb-3 sm:mb-4">
+          <label className="block text-gray-700 text-sm sm:text-base">이름</label>
           <div className="relative">
-            <span className="absolute inset-y-0 left-3 flex items-center text-gray-500">👤</span>
+            <span className="absolute inset-y-0 left-3 flex items-center text-gray-500 text-sm sm:text-base">👤</span>
             <input
               type="text"
               name="name"
               value={form.name}
               onChange={handleChange}
-              className="pl-10 w-full p-2 border border-gray-300 rounded"
+              className="pl-12 sm:pl-14 w-full p-2 sm:p-3 border border-gray-300 rounded text-sm sm:text-base"
               placeholder="이름을 입력하세요"
               required
             />
           </div>
-          {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
+          {errors.name && <p className="text-red-500 text-xs sm:text-sm">{errors.name}</p>}
         </div>
 
-        <div className="mb-4">
-          <label className="block text-gray-700">비밀번호</label>
+        <div className="mb-3 sm:mb-4">
+          <label className="block text-gray-700 text-sm sm:text-base">비밀번호</label>
           <div className="relative">
-            <span className="absolute inset-y-0 left-3 flex items-center text-gray-500">🔒</span>
+            <span className="absolute inset-y-0 left-3 flex items-center text-gray-500 text-sm sm:text-base">🔒</span>
             <input
               type="password"
               name="password"
               value={form.password}
               onChange={handleChange}
-              className="pl-10 w-full p-2 border border-gray-300 rounded"
+              className="pl-12 sm:pl-14 w-full p-2 sm:p-3 border border-gray-300 rounded text-sm sm:text-base"
               placeholder="비밀번호를 입력하세요"
               required
             />
           </div>
-          <p className="text-xs text-gray-500 mt-1">8자 이상, 영문, 숫자, 특수문자를 포함해주세요.</p>
-          {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">8자 이상, 영문, 숫자, 특수문자를 포함해주세요.</p>
+          {errors.password && <p className="text-red-500 text-xs sm:text-sm">{errors.password}</p>}
         </div>
 
-        <div className="mb-6">
-          <label className="block text-gray-700">비밀번호 확인</label>
+        <div className="mb-5 sm:mb-6">
+          <label className="block text-gray-700 text-sm sm:text-base">비밀번호 확인</label>
           <div className="relative">
-            <span className="absolute inset-y-0 left-3 flex items-center text-gray-500">🔒</span>
+            <span className="absolute inset-y-0 left-3 flex items-center text-gray-500 text-sm sm:text-base">🔒</span>
             <input
               type="password"
               name="confirmPassword"
               value={form.confirmPassword}
               onChange={handleChange}
-              className="pl-10 w-full p-2 border border-gray-300 rounded"
+              className="pl-12 sm:pl-14 w-full p-2 sm:p-3 border border-gray-300 rounded text-sm sm:text-base"
               placeholder="비밀번호를 한번 더 입력하세요"
               required
             />
           </div>
-          {errors.confirmPassword && <p className="text-red-500 text-sm">{errors.confirmPassword}</p>}
+          {errors.confirmPassword && <p className="text-red-500 text-xs sm:text-sm">{errors.confirmPassword}</p>}
         </div>
 
-        <div className="flex justify-between">
-          <button type="submit" className="w-1/2 bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
+        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+          <button type="submit" className="w-full sm:w-1/2 bg-blue-500 text-white p-2 rounded hover:bg-blue-600 text-sm sm:text-base">
             가입하기
           </button>
           <button
             type="button"
             onClick={handleCancel}
-            className="w-1/2 bg-gray-300 p-2 rounded hover:bg-red-500 hover:text-white transition"
+            className="w-full sm:w-1/2 bg-gray-300 p-2 rounded hover:bg-red-500 hover:text-white transition text-sm sm:text-base"
           >
             취소
           </button>

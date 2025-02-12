@@ -60,55 +60,55 @@ const ChangePassword: React.FC = observer(() => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <main className="max-w-3xl mx-auto mt-6 p-6 bg-white shadow rounded">
-        <h1 className="text-2xl font-bold mb-4">비밀번호 변경</h1>
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+      <main className="w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl mx-auto bg-white shadow-md rounded-lg p-6">
+        <h1 className="text-xl sm:text-2xl font-bold mb-4 text-center">비밀번호 변경</h1>
 
-        {error && <p className="text-red-500 mb-4">{error}</p>}
+        {error && <p className="text-red-500 mb-4 text-sm sm:text-base">{error}</p>}
 
         <div className="mb-4">
-          <label className="block text-gray-700">현재 비밀번호</label>
+          <label className="block text-gray-700 text-sm sm:text-base">현재 비밀번호</label>
           <input
             type="password"
             value={currentPassword}
             onChange={(e) => setCurrentPassword(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded mt-1"
+            className="w-full p-2 border border-gray-300 rounded mt-1 text-sm sm:text-base"
             placeholder="현재 비밀번호 입력"
           />
         </div>
 
         <div className="mb-4">
-          <label className="block text-gray-700">새 비밀번호</label>
+          <label className="block text-gray-700 text-sm sm:text-base">새 비밀번호</label>
           <input
             type="password"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded mt-1"
+            className="w-full p-2 border border-gray-300 rounded mt-1 text-sm sm:text-base"
             placeholder="새 비밀번호 입력"
           />
         </div>
 
         <div className="mb-4">
-          <label className="block text-gray-700">새 비밀번호 확인</label>
+          <label className="block text-gray-700 text-sm sm:text-base">새 비밀번호 확인</label>
           <input
             type="password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded mt-1"
+            className="w-full p-2 border border-gray-300 rounded mt-1 text-sm sm:text-base"
             placeholder="새 비밀번호 확인"
           />
         </div>
 
-        <div className="flex space-x-4">
+        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
           <button
             onClick={handleChangePassword}
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition text-sm sm:text-base"
           >
             변경하기
           </button>
           <button
             onClick={handleCancel}
-            className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400 transition"
+            className="bg-gray-300 px-4 py-2 rounded hover:bg-red-500 transition text-sm sm:text-base"
           >
             취소
           </button>

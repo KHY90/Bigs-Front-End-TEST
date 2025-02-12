@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import authStore from "../stores/authStore";
 import { observer } from "mobx-react-lite";
+import CommentSection from "../components/CommentSection";
 
 interface BlogDetail {
   id: number;
@@ -13,6 +14,13 @@ interface BlogDetail {
   createdAt: string;
   author: string;
 }
+
+const categoryNames: Record<string, string> = {
+  NOTICE: "공지",
+  FREE: "자유",
+  QNA: "Q&A",
+  ETC: "기타",
+};
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 
@@ -38,15 +46,15 @@ const DetailPage: React.FC = observer(() => {
 
   if (!post) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-500">게시글을 불러오는 중...</p>
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <p className="text-gray-500 text-center">게시글을 불러오는 중...</p>
       </div>
     );
   }
 
   const imageSrc = post.imageUrl
-    ? post.imageUrl.startsWith("http") 
-      ? post.imageUrl 
+    ? post.imageUrl.startsWith("http")
+      ? post.imageUrl
       : `${BASE_URL}${post.imageUrl}`
     : "/image/default-image.png";
 
@@ -66,41 +74,59 @@ const DetailPage: React.FC = observer(() => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <main className="max-w-3xl mx-auto mt-6 p-6 bg-white shadow rounded">
-        <h1 className="text-3xl font-bold mb-4">{post.title}</h1>
-        <p className="text-gray-500 mb-4">{post.boardCategory} · {new Date(post.createdAt).toLocaleDateString()}</p>
-
-        {post.imageUrl && (
-          <div className="mb-4">
-            <img src={imageSrc} alt="게시글 이미지" className="w-full h-auto max-h-96 object-cover rounded-lg shadow" />
+    <div className="min-h-screen bg-gray-100 flex justify-center p-4">
+      <main className="w-full max-w-lg sm:max-w-xl md:max-w-2xl lg:max-w-3xl bg-white shadow-md rounded-lg p-6">
+        <div className="flex justify-between items-center mb-4">
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => navigate("/main")}
+              className="text-gray-600 hover:text-black text-lg"
+            >
+              &lt;
+            </button>
+            <span className="text-gray-600 text-sm sm:text-base">
+              {categoryNames[post.boardCategory] || "카테고리 없음"}
+            </span>
           </div>
-        )}
-
-        <p className="text-gray-700 whitespace-pre-wrap">{post.content}</p>
-
-        <div className="flex justify-between mt-6">
-          <button
-            onClick={() => navigate("/main")}
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
-          >
-            뒤로 가기
-          </button>
-          <div className="space-x-2">
+          <div className="flex space-x-2">
             <button
               onClick={() => navigate(`/edit/${id}`)}
-              className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition"
+              className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 transition text-sm"
             >
               ✏️ 수정
             </button>
             <button
               onClick={handleDelete}
-              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
+              className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition text-sm"
             >
               🗑 삭제
             </button>
           </div>
         </div>
+
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-center">{post.title}</h1>
+
+        <p className="text-gray-500 text-sm sm:text-base text-right mb-4">
+          {new Date(post.createdAt).toLocaleDateString()}
+        </p>
+
+        {post.imageUrl && (
+          <div className="mb-6">
+            <img
+              src={imageSrc}
+              alt="게시글 이미지"
+              className="w-full h-auto max-h-64 sm:max-h-80 md:max-h-96 object-cover rounded-lg shadow"
+            />
+          </div>
+        )}
+
+        <div className="bg-gray-25 p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
+          <p className="text-gray-800 text-base sm:text-lg leading-relaxed whitespace-pre-wrap">
+            {post.content}
+          </p>
+        </div>
+
+        <CommentSection postId={post.id} />
       </main>
     </div>
   );

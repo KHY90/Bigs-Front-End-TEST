@@ -6,6 +6,8 @@ import WriteButton from "../components/WriteButton";
 import Pagination from "../components/Pagination";
 import ScrapButton from "../components/ScrapButton";
 import { handleEdit, handleDelete } from "../utils/postActions";
+import SortDropdown from "../components/SortDropdown";
+import SearchBar from "../components/SearchBar";
 
 const POSTS_PER_PAGE = 6;
 
@@ -13,9 +15,11 @@ const CategoryPage: React.FC = () => {
   const { category } = useParams<{ category: string }>();
   const navigate = useNavigate();
   const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [filteredPosts, setFilteredPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<{ [key: string]: string }>({});
   const [currentPage, setCurrentPage] = useState(1);
+  const [sortOrder, setSortOrder] = useState<"latest" | "oldest">("latest");
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -23,10 +27,13 @@ const CategoryPage: React.FC = () => {
         const data = await fetchWithToken(`/api/boards?page=0&size=50`);
         if (Array.isArray(data.content)) {
           const formattedCategory = category?.toUpperCase();
-          setPosts(data.content.filter((post: { category: string | undefined; }) => post.category === formattedCategory));
+          const filtered = data.content.filter((post: { category: string | undefined; }) => post.category === formattedCategory);
+          setPosts(filtered);
+          setFilteredPosts(filtered);
         } else {
           console.error("잘못된 응답 형식:", data);
           setPosts([]);
+          setFilteredPosts([]);
         }
       } catch (error) {
         console.error("게시글 가져오기 실패:", error);
@@ -51,32 +58,48 @@ const CategoryPage: React.FC = () => {
     fetchCategories();
   }, []);
 
-  const totalPages = Math.max(1, Math.ceil(posts.length / POSTS_PER_PAGE));
-  const displayedPosts = posts.slice((currentPage - 1) * POSTS_PER_PAGE, currentPage * POSTS_PER_PAGE);
+  const handleSearch = (query: string) => {
+    if (query.trim() === "") {
+      setFilteredPosts(posts);
+    } else {
+      const filtered = posts.filter((post) => post.title.toLowerCase().includes(query.toLowerCase()));
+      setFilteredPosts(filtered);
+    }
+    setCurrentPage(1);
+  };
+
+  const totalPages = Math.max(1, Math.ceil(filteredPosts.length / POSTS_PER_PAGE));
+  const displayedPosts = filteredPosts
+    .sort((a, b) => (sortOrder === "latest" ? b.createdAt.localeCompare(a.createdAt) : a.createdAt.localeCompare(b.createdAt)))
+    .slice((currentPage - 1) * POSTS_PER_PAGE, currentPage * POSTS_PER_PAGE);
 
   return (
-    <div className="min-h-[90vh] bg-white p-6 shadow-lg flex flex-col">
-      <h1 className="text-2xl font-bold mb-6">{categories[category || ""] || "게시판"}</h1>
+    <div className="min-h-[90vh] bg-white p-4 sm:p-6 shadow-lg flex flex-col">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold">{categories[category || ""] || "게시판"}</h1>
+        <SortDropdown sortOrder={sortOrder} setSortOrder={setSortOrder} />
+      </div>
+
 
       <div className="flex-grow">
         {loading ? (
-          <p>게시글을 불러오는 중...</p>
+          <p className="text-gray-500 text-center">게시글을 불러오는 중...</p>
         ) : displayedPosts.length === 0 ? (
-          <p className="text-gray-500">게시글이 없습니다.</p>
+          <p className="text-gray-500 text-center">게시글이 없습니다.</p>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {displayedPosts.map((post) => (
               <div
                 key={post.id}
-                className="bg-white p-3 rounded shadow cursor-pointer hover:bg-gray-50 transition flex justify-between items-center h-[70px]"
+                className="bg-white p-3 rounded shadow cursor-pointer hover:bg-gray-50 transition flex flex-col sm:flex-row justify-between items-start sm:items-center"
                 onClick={() => navigate(`/detail/${post.id}`)}
               >
-                <div>
-                  <h2 className="font-semibold text-md truncate">{post.title}</h2>
-                  <p className="text-xs text-gray-600">{new Date(post.createdAt).toLocaleDateString()}</p>
+                <div className="flex-1">
+                  <h2 className="font-semibold text-sm sm:text-md truncate">{post.title}</h2>
+                  <p className="text-xs sm:text-sm text-gray-600">{new Date(post.createdAt).toLocaleDateString()}</p>
                 </div>
 
-                <div className="flex space-x-2">
+                <div className="flex space-x-2 mt-2 sm:mt-0 sm:ml-4 self-end sm:self-center">
                   <ScrapButton postId={post.id} />
 
                   <button
@@ -84,7 +107,7 @@ const CategoryPage: React.FC = () => {
                       e.stopPropagation();
                       handleEdit(post.id, navigate);
                     }}
-                    className="text-yellow-500 hover:text-yellow-600"
+                    className="text-yellow-500 hover:text-yellow-600 text-sm"
                   >
                     ✏️
                   </button>
@@ -94,7 +117,7 @@ const CategoryPage: React.FC = () => {
                       e.stopPropagation();
                       handleDelete(post.id, setPosts);
                     }}
-                    className="text-red-500 hover:text-red-600"
+                    className="text-red-500 hover:text-red-600 text-sm"
                   >
                     🗑
                   </button>
@@ -103,6 +126,9 @@ const CategoryPage: React.FC = () => {
             ))}
           </div>
         )}
+      </div>
+      <div className="mt-6">
+      <SearchBar onSearch={handleSearch} />
       </div>
 
       <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />

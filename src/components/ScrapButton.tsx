@@ -2,9 +2,10 @@ import React, { useState, useEffect } from "react";
 
 interface ScrapButtonProps {
   postId: number;
+  onScrapChange?: () => void;
 }
 
-const ScrapButton: React.FC<ScrapButtonProps> = ({ postId }) => {
+const ScrapButton: React.FC<ScrapButtonProps> = ({ postId, onScrapChange }) => {
   const [isScrapped, setIsScrapped] = useState<boolean>(false);
 
   useEffect(() => {
@@ -26,6 +27,8 @@ const ScrapButton: React.FC<ScrapButtonProps> = ({ postId }) => {
       sessionStorage.setItem("scrappedPosts", JSON.stringify(scrappedPosts));
       setIsScrapped(true);
     }
+
+    if (onScrapChange) onScrapChange();
   };
 
   return (

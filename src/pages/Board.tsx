@@ -43,37 +43,37 @@ const Board: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <main className="max-w-5xl mx-auto mt-4">
+      <main className="max-w-5xl mx-auto mt-4 p-4 sm:p-6 lg:p-8">
         <Banner posts={posts} loading={loading} />
 
-        <section className="bg-white p-6 rounded shadow">
-          <h2 className="text-xl font-bold mb-4">카테고리 별 게시글</h2>
+        <section className="bg-white p-4 sm:p-6 rounded shadow">
+          <h2 className="text-lg sm:text-xl font-bold mb-4">카테고리 별 게시글</h2>
 
           {loading ? (
             <p className="text-gray-500 text-center">게시글을 불러오는 중...</p>
           ) : (
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {Object.entries(categoryNames).map(([key, name]) => (
-                <div key={key} className="min-h-[220px]">
-                  <h3 className="text-lg font-bold mb-2">{name}</h3>
+                <div key={key} className="min-h-[180px] sm:min-h-[220px]">
+                  <h3 className="text-md sm:text-lg font-bold mb-2">{name}</h3>
                   {categorizedPosts[key]?.length ? (
                     categorizedPosts[key].map((post) => (
                       <div
                         key={post.id}
-                        className="bg-white p-3 border shadow rounded mb-3 cursor-pointer hover:bg-gray-100 transition flex justify-between items-center"
+                        className="bg-white p-3 border shadow rounded mb-3 cursor-pointer hover:bg-gray-100 transition flex flex-col sm:flex-row justify-between items-start sm:items-center"
                         onClick={() => navigate(`/detail/${post.id}`)}
                       >
-                        <div>
-                          <h4 className="font-semibold">{post.title}</h4>
-                          <p className="text-sm text-gray-500">
-                            {post.author} {new Date(post.createdAt).toLocaleDateString()}
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-sm sm:text-base">{post.title}</h4>
+                          <p className="text-xs sm:text-sm text-gray-500">
+                            {post.author} · {new Date(post.createdAt).toLocaleDateString()}
                           </p>
-                          <p className="text-xs text-gray-600">
+                          <p className="hidden sm:block text-xs text-gray-600">
                             {post.content ? post.content.substring(0, 50) + "..." : ""}
                           </p>
                         </div>
 
-                        <div className="flex space-x-2">
+                        <div className="flex space-x-2 mt-2 sm:mt-0 sm:ml-4 self-end sm:self-center">
                           <ScrapButton postId={post.id} />
 
                           <button
@@ -81,7 +81,7 @@ const Board: React.FC = () => {
                               e.stopPropagation();
                               handleEdit(post.id, navigate);
                             }}
-                            className="text-yellow-500 hover:text-yellow-600"
+                            className="text-yellow-500 hover:text-yellow-600 text-sm"
                           >
                             ✏️
                           </button>
@@ -91,7 +91,7 @@ const Board: React.FC = () => {
                               e.stopPropagation();
                               handleDelete(post.id, setPosts);
                             }}
-                            className="text-red-500 hover:text-red-600"
+                            className="text-red-500 hover:text-red-600 text-sm"
                           >
                             🗑
                           </button>
@@ -99,7 +99,7 @@ const Board: React.FC = () => {
                       </div>
                     ))
                   ) : (
-                    <p className="text-gray-500">게시물이 없습니다.</p>
+                    <p className="text-gray-500 text-sm sm:text-base">게시물이 없습니다.</p>
                   )}
                 </div>
               ))}

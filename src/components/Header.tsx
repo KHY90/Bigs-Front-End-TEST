@@ -12,7 +12,9 @@ const Header: React.FC = observer(() => {
 
   const [categories, setCategories] = useState<{ [key: string]: string }>({});
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isNavOpen, setIsNavOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const avatarRef = useRef<HTMLImageElement | null>(null);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -29,7 +31,11 @@ const Header: React.FC = observer(() => {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node) &&
+        avatarRef.current !== event.target
+      ) {
         setIsDropdownOpen(false);
       }
     };
@@ -46,15 +52,23 @@ const Header: React.FC = observer(() => {
   };
 
   return (
-    <header className="flex justify-between items-center p-4 bg-white shadow">
-      <div className="flex items-center space-x-8">
+    <header className="flex justify-between items-center p-4 bg-white shadow-md relative z-50">
+      <div className="flex items-center space-x-4">
         <img
           src="/image/bigslogo.png"
           alt="Logo"
-          className="h-8 cursor-pointer"
+          className="h-6 sm:h-8 md:h-10 cursor-pointer"
           onClick={() => navigate("/main")}
         />
-        <nav className="flex space-x-6 text-gray-700">
+
+        <button
+          className="block md:hidden text-gray-600"
+          onClick={() => setIsNavOpen(!isNavOpen)}
+        >
+          ☰
+        </button>
+
+        <nav className="hidden md:flex space-x-4 text-gray-700">
           {Object.entries(categories).map(([key, label]) => (
             <button
               key={key}
@@ -69,8 +83,38 @@ const Header: React.FC = observer(() => {
         </nav>
       </div>
 
+      {isNavOpen && (
+        <>
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-40"
+            onClick={() => setIsNavOpen(false)}
+          />
+          <nav className="fixed top-0 left-0 w-3/4 h-full bg-white shadow-md p-6 flex flex-col space-y-2 z-50">
+            <button
+              className="self-end text-gray-600 text-lg"
+              onClick={() => setIsNavOpen(false)}
+            >
+              ✕
+            </button>
+            {Object.entries(categories).map(([key, label]) => (
+              <button
+                key={key}
+                className="text-left hover:bg-gray-100 p-2 rounded"
+                onClick={() => {
+                  setIsNavOpen(false);
+                  navigate(`/category/${key}`);
+                }}
+              >
+                {label}
+              </button>
+            ))}
+          </nav>
+        </>
+      )}
+
       <div className="relative">
         <img
+          ref={avatarRef}
           src={userImage || defaultImage}
           alt="Profile"
           className="w-8 h-8 rounded-full object-cover border cursor-pointer"

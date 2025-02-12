@@ -13,10 +13,11 @@ class AuthStore {
   }
 
   // 로그인
-  login = (name: string, email: string, accessToken: string, refreshToken: string) => {
+  login = (name: string, email: string, accessToken: string, refreshToken: string, imageUrl?: string) => {
     runInAction(() => {
       this.userName = name;
       this.userEmail = email;
+      this.userImage = imageUrl || "/image/avatar.png";
       this.accessToken = accessToken;
       this.refreshToken = refreshToken;
       this.isAuthenticated = true;
@@ -24,11 +25,12 @@ class AuthStore {
 
     sessionStorage.setItem("userName", name);
     sessionStorage.setItem("userEmail", email);
+    sessionStorage.setItem("userImage", imageUrl || "/image/avatar.png");
     sessionStorage.setItem("accessToken", accessToken);
     sessionStorage.setItem("refreshToken", refreshToken);
   };
 
-  // 로그아웃 
+  // 로그아웃
   clearAuth = () => {
     runInAction(() => {
       this.userName = "User";
@@ -41,6 +43,7 @@ class AuthStore {
 
     sessionStorage.removeItem("userName");
     sessionStorage.removeItem("userEmail");
+    sessionStorage.removeItem("userImage");
     sessionStorage.removeItem("accessToken");
     sessionStorage.removeItem("refreshToken");
   };
@@ -55,6 +58,19 @@ class AuthStore {
 
     sessionStorage.setItem("accessToken", accessToken);
     sessionStorage.setItem("refreshToken", refreshToken);
+  };
+
+  // 유저 정보 변경 (이름, 이메일, 이미지)
+  setUserInfo = (name: string, email: string, imageUrl: string) => {
+    runInAction(() => {
+      this.userName = name;
+      this.userEmail = email;
+      this.userImage = imageUrl;
+    });
+
+    sessionStorage.setItem("userName", name);
+    sessionStorage.setItem("userEmail", email);
+    sessionStorage.setItem("userImage", imageUrl);
   };
 }
 

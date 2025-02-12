@@ -18,7 +18,6 @@ const EditPage: React.FC = observer(() => {
     const fetchPostDetail = async () => {
       try {
         const data = await fetchWithToken(`/api/boards/${id}`);
-        console.log("게시글 수정 정보:", data);
         postStore.setTitle(data.title);
         postStore.setCategory(data.boardCategory);
         postStore.setContent(data.content);
@@ -76,9 +75,9 @@ const EditPage: React.FC = observer(() => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex justify-center items-center p-6">
-      <main className="bg-white shadow-lg p-6 rounded-lg w-full max-w-3xl">
-        <h1 className="text-2xl font-bold mb-6">게시글 수정</h1>
+    <div className="min-h-screen bg-gray-100 flex justify-center items-center p-4 sm:p-6">
+      <main className="bg-white shadow-lg p-4 sm:p-6 rounded-lg w-full max-w-lg sm:max-w-xl md:max-w-2xl">
+        <h1 className="text-xl sm:text-2xl font-bold mb-6 text-center">게시글 수정</h1>
 
         <div className="space-y-4">
           <div>
@@ -87,7 +86,7 @@ const EditPage: React.FC = observer(() => {
               type="text"
               value={postStore.title}
               onChange={(e) => postStore.setTitle(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded mt-1"
+              className="w-full p-2 border border-gray-300 rounded mt-1 text-sm sm:text-base"
             />
           </div>
 
@@ -96,13 +95,13 @@ const EditPage: React.FC = observer(() => {
             <select
               value={postStore.category}
               onChange={(e) => postStore.setCategory(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded mt-1"
+              className="w-full max-w-xs sm:max-w-sm md:max-w-md p-2 sm:p-3 border border-gray-300 rounded mt-1 text-sm sm:text-base"
             >
               <option value="">카테고리 선택</option>
               <option value="NOTICE">공지</option>
               <option value="FREE">자유</option>
-              <option value="Q&A">Q&A</option>
-              <option value="OTHER">기타</option>
+              <option value="QNA">Q&A</option>
+              <option value="ETC">기타</option>
             </select>
           </div>
 
@@ -111,11 +110,11 @@ const EditPage: React.FC = observer(() => {
             <textarea
               value={postStore.content}
               onChange={(e) => postStore.setContent(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded mt-1 h-32"
+              className="w-full p-2 border border-gray-300 rounded mt-1 h-24 sm:h-32 text-sm sm:text-base"
             />
           </div>
 
-          <div className="border border-dashed p-6 text-center rounded relative bg-gray-100">
+          <div className="border border-dashed p-4 sm:p-6 text-center rounded relative bg-gray-100">
             <input
               type="file"
               accept="image/*"
@@ -128,7 +127,7 @@ const EditPage: React.FC = observer(() => {
                 <img
                   src={postStore.preview}
                   alt="미리보기"
-                  className="w-40 h-40 object-cover rounded shadow border-2 border-gray-300"
+                  className="w-32 sm:w-40 h-32 sm:h-40 object-cover rounded shadow border-2 border-gray-300"
                   onError={(e) => (e.currentTarget.src = "/image/default.png")}
                 />
               ) : (
@@ -136,25 +135,27 @@ const EditPage: React.FC = observer(() => {
                   <img
                     src="/image/default.png"
                     alt="Upload"
-                    className="w-12 mx-auto mb-2 opacity-80"
+                    className="w-10 sm:w-12 mx-auto mb-2 opacity-80"
                     onError={(e) => (e.currentTarget.src = "/image/default.png")}
                   />
-                  <p className="text-gray-600">이미지를 드래그하여 업로드하거나 파일 선택해 주세요.</p>
+                  <p className="text-gray-600 text-xs sm:text-sm">
+                    이미지를 드래그하여 업로드하거나 파일 선택해 주세요.
+                  </p>
                 </>
               )}
             </label>
           </div>
 
-          <div className="flex justify-end space-x-2">
+          <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2">
             <button
               onClick={handleSubmit}
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              className="bg-blue-500 text-white px-3 sm:px-4 py-2 rounded hover:bg-blue-600 text-sm sm:text-base transition w-full sm:w-auto"
             >
               수정하기
             </button>
             <button
               onClick={handleCancel}
-              className="bg-gray-300 px-4 py-2 rounded hover:bg-red-500 hover:text-white transition"
+              className="bg-gray-300 px-3 sm:px-4 py-2 rounded hover:bg-red-500 hover:text-white text-sm sm:text-base transition w-full sm:w-auto"
             >
               취소
             </button>
