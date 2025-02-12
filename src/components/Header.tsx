@@ -1,15 +1,18 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState, useRef } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { observer } from "mobx-react-lite";
 import authStore from "../stores/authStore";
 import { fetchWithToken } from "../utils/fetchWithToken";
 
 const Header: React.FC = observer(() => {
   const navigate = useNavigate();
-  const { userName, userImage, clearAuth } = authStore;
+  const location = useLocation();
+  const { userName, userEmail, userImage, clearAuth } = authStore;
   const defaultImage = "/image/avatar.png";
 
   const [categories, setCategories] = useState<{ [key: string]: string }>({});
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -22,6 +25,17 @@ const Header: React.FC = observer(() => {
     };
 
     fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleLogout = () => {
@@ -42,27 +56,53 @@ const Header: React.FC = observer(() => {
         />
         <nav className="flex space-x-6 text-gray-700">
           {Object.entries(categories).map(([key, label]) => (
-            <button key={key} className="hover:underline" onClick={() => navigate(`/category/${key}`)}>
+            <button
+              key={key}
+              className={`hover:underline hover:text-blue-600 ${
+                location.pathname.includes(`/category/${key}`) ? "text-blue-600 underline" : ""
+              }`}
+              onClick={() => navigate(`/category/${key}`)}
+            >
               {label}
             </button>
           ))}
         </nav>
       </div>
 
-      <div className="flex items-center space-x-4">
+      <div className="relative">
         <img
           src={userImage || defaultImage}
           alt="Profile"
           className="w-8 h-8 rounded-full object-cover border cursor-pointer"
-          onClick={() => navigate("/profile")}
+          onClick={() => setIsDropdownOpen((prev) => !prev)}
         />
-        <span className="font-semibold cursor-pointer" onClick={() => navigate("/profile")}>
-          {userName || "User"}
-        </span>
 
-        <button onClick={handleLogout} className="text-gray-600 hover:underline">
-          로그아웃
-        </button>
+        {isDropdownOpen && (
+          <div
+            ref={dropdownRef}
+            className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md overflow-hidden z-50"
+          >
+            <div className="p-4 border-b">
+              <p className="font-semibold">{userName || "User"}</p>
+              <p className="text-sm text-gray-500">{userEmail || "이메일 없음"}</p>
+            </div>
+            <button
+              onClick={() => {
+                setIsDropdownOpen(false);
+                navigate("/profile");
+              }}
+              className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+            >
+              ⚙️ 설정
+            </button>
+            <button
+              onClick={handleLogout}
+              className="block w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100"
+            >
+              🚪 로그아웃
+            </button>
+          </div>
+        )}
       </div>
     </header>
   );
