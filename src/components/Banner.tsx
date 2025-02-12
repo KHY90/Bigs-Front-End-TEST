@@ -46,9 +46,9 @@ const Banner: React.FC<BannerProps> = ({ posts, loading }) => {
   }
 
   return (
-    <div className="relative bg-white shadow-lg rounded mb-6 flex items-center justify-center overflow-hidden
-      h-40 sm:h-48 md:h-56 lg:h-64 xl:h-72">
-      
+    <div className="relative bg-white shadow-lg rounded mb-3 flex items-center justify-center overflow-hidden
+  h-40 sm:h-48 md:h-56 lg:h-64 xl:h-72">
+
       {categoryPosts.length > 0 && (
         <>
           <div

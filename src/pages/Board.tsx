@@ -43,7 +43,7 @@ const Board: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <main className="max-w-5xl mx-auto mt-4 p-4 sm:p-6 lg:p-8">
+      <main className="max-w-5xl mx-auto mt-2 p-4 sm:p-6 lg:p-8">
         <Banner posts={posts} loading={loading} />
 
         <section className="bg-white p-4 sm:p-6 rounded shadow">

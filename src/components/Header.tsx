@@ -72,7 +72,7 @@ const Header: React.FC = observer(() => {
           {Object.entries(categories).map(([key, label]) => (
             <button
               key={key}
-              className={`hover:underline hover:text-blue-600 ${
+              className={`font-semibold hover:underline hover:text-blue-600 ${
                 location.pathname.includes(`/category/${key}`) ? "text-blue-600 underline" : ""
               }`}
               onClick={() => navigate(`/category/${key}`)}
