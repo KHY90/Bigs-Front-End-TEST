@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { fetchWithToken } from "../utils/fetchWithToken";
-import { BlogPost } from "../types/types"; 
+import { BlogPost } from "../types/types";
 import WriteButton from "../components/WriteButton";
 import Pagination from "../components/Pagination";
 import ScrapButton from "../components/ScrapButton";
@@ -20,9 +20,10 @@ const CategoryPage: React.FC = () => {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const data = await fetchWithToken(`/api/boards?page=0&size=10`);
+        const data = await fetchWithToken(`/api/boards?page=0&size=50`);
         if (Array.isArray(data.content)) {
-          setPosts(data.content.filter((post: { category?: string }) => post.category === category));
+          const formattedCategory = category?.toUpperCase();
+          setPosts(data.content.filter((post: { category: string | undefined; }) => post.category === formattedCategory));
         } else {
           console.error("잘못된 응답 형식:", data);
           setPosts([]);
@@ -70,19 +71,17 @@ const CategoryPage: React.FC = () => {
                 className="bg-white p-3 rounded shadow cursor-pointer hover:bg-gray-50 transition flex justify-between items-center h-[70px]"
                 onClick={() => navigate(`/detail/${post.id}`)}
               >
-                {/* 🔹 게시글 정보 */}
                 <div>
                   <h2 className="font-semibold text-md truncate">{post.title}</h2>
                   <p className="text-xs text-gray-600">{new Date(post.createdAt).toLocaleDateString()}</p>
                 </div>
 
-                {/* 🔹 버튼 그룹 */}
                 <div className="flex space-x-2">
                   <ScrapButton postId={post.id} />
 
                   <button
                     onClick={(e) => {
-                      e.stopPropagation(); // 🔹 디테일 페이지 이동 방지
+                      e.stopPropagation();
                       handleEdit(post.id, navigate);
                     }}
                     className="text-yellow-500 hover:text-yellow-600"
@@ -92,7 +91,7 @@ const CategoryPage: React.FC = () => {
 
                   <button
                     onClick={(e) => {
-                      e.stopPropagation(); // 🔹 디테일 페이지 이동 방지
+                      e.stopPropagation();
                       handleDelete(post.id, navigate);
                     }}
                     className="text-red-500 hover:text-red-600"

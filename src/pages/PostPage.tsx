@@ -36,31 +36,32 @@ const PostPage: React.FC = observer(() => {
       alert("제목, 카테고리, 내용을 모두 입력해주세요.");
       return;
     }
-
+  
     if (!window.confirm("게시글을 등록하시겠습니까?")) return;
-
+  
     const formData = new FormData();
+  
     const postData = { title, content, category };
-
     formData.append("request", new Blob([JSON.stringify(postData)], { type: "application/json" }));
+  
     if (image) {
       formData.append("file", image);
     }
-
+  
     try {
       await fetchWithToken("/api/boards", {
         method: "POST",
-        data: formData,
+        data: formData, 
       });
-
+  
       alert("게시글이 등록되었습니다.");
-      navigate("/main");
+      navigate(`/category/${category}`);
     } catch (error) {
       console.error("게시글 등록 실패:", error);
       alert("게시글 등록 중 오류가 발생했습니다.");
     }
   };
-
+  
   const handleCancel = () => {
     if (window.confirm("게시글 작성을 취소하시겠습니까?")) {
       navigate("/main");
@@ -94,8 +95,8 @@ const PostPage: React.FC = observer(() => {
               <option value="">카테고리 선택</option>
               <option value="NOTICE">공지</option>
               <option value="FREE">자유</option>
-              <option value="Q&A">Q&A</option>
-              <option value="OTHER">기타</option>
+              <option value="QNA">Q&A</option>
+              <option value="ETC">기타</option>
             </select>
           </div>
 
@@ -116,7 +117,7 @@ const PostPage: React.FC = observer(() => {
                 <img src={preview} alt="미리보기" className="w-40 h-40 object-cover rounded shadow border-2 border-gray-300" />
               ) : (
                 <>
-                  <img src="/image/upload-icon.png" alt="Upload" className="w-12 mx-auto mb-2 opacity-80" />
+                  <img src="/image/default.png" alt="Upload" className="w-12 mx-auto mb-2 opacity-80" />
                   <p className="text-gray-600">이미지를 드래그하여 업로드하거나 파일 선택해 주세요.</p>
                 </>
               )}

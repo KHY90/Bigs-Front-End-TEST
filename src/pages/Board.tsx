@@ -10,8 +10,8 @@ import { handleEdit, handleDelete } from "../utils/postActions";
 const categoryNames: Record<string, string> = {
   NOTICE: "공지",
   FREE: "자유",
-  "Q&A": "Q&A",
-  OTHER: "기타",
+  "QNA": "Q&A",
+  ETC: "기타",
 };
 
 const Board: React.FC = () => {
@@ -22,7 +22,7 @@ const Board: React.FC = () => {
   const fetchPosts = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await fetchWithToken(`/api/boards?page=0&size=10`);
+      const data = await fetchWithToken(`/api/boards?page=0&size=50`);
       setPosts(data.content || []);
     } catch (error) {
       console.error("게시글 불러오기 실패:", error);
@@ -47,7 +47,7 @@ const Board: React.FC = () => {
         <Banner posts={posts} loading={loading} />
 
         <section className="bg-white p-6 rounded shadow">
-          <h2 className="text-xl font-bold mb-4">블로그 글</h2>
+          <h2 className="text-xl font-bold mb-4">카테고리 별 게시글</h2>
 
           {loading ? (
             <p className="text-gray-500 text-center">게시글을 불러오는 중...</p>
