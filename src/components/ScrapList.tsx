@@ -73,7 +73,7 @@ const ScrapList: React.FC = () => {
       <h1 className="text-2xl font-bold mb-4">📌 스크랩한 글</h1>
 
       {scrappedPosts.length > 0 && (
-        <div className="mb-4 flex flex-col sm:flex-row justify-between items-center">
+        <div className="mb-4 flex flex-col sm:flex-row justify-end items-center">
           <SortDropdown sortOrder={sortOrder} setSortOrder={setSortOrder} />
         </div>
       )}
