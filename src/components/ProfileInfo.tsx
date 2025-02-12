@@ -8,25 +8,22 @@ const ProfileInfo: React.FC = observer(() => {
   const [isEditingName, setIsEditingName] = useState(false);
   const [newName, setNewName] = useState(authStore.userName);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      const imageUrl = URL.createObjectURL(file);
-      authStore.setUserInfo(authStore.userName, authStore.userEmail, imageUrl);
-      alert("프로필 이미지가 변경되었습니다!");
-    }
-  };
-
   const handleUpdateProfile = () => {
     if (!newName.trim()) {
       alert("이름을 입력해주세요.");
       return;
     }
 
-    if (window.confirm("이름을 변경하시겠습니까?")) {
-      authStore.setUserInfo(newName, authStore.userEmail, authStore.userImage);
-      setIsEditingName(false);
-      alert("이름이 변경되었습니다.");
+    authStore.setUserInfo(newName, authStore.userEmail, authStore.userImage);
+    setIsEditingName(false);
+    alert("이름이 변경되었습니다.");
+  };
+
+  const handleDeleteAccount = () => {
+    if (window.confirm("정말 회원 탈퇴하시겠습니까? 탈퇴 후 계정 복구는 불가능합니다.")) {
+      authStore.clearAuth();
+      alert("회원 탈퇴가 완료되었습니다.");
+      navigate("/signin");
     }
   };
 
@@ -34,14 +31,11 @@ const ProfileInfo: React.FC = observer(() => {
     <div className="text-center">
       <h1 className="text-2xl font-bold mb-4">프로필</h1>
 
-      <label htmlFor="fileInput" className="cursor-pointer">
-        <img
-          src={authStore.userImage}
-          alt="Profile"
-          className="w-24 h-24 object-cover rounded-full border mx-auto"
-        />
-      </label>
-      <input type="file" accept="image/*" id="fileInput" className="hidden" onChange={handleImageChange} />
+      <img
+        src={authStore.userImage}
+        alt="Profile"
+        className="w-24 h-24 object-cover rounded-full border mx-auto"
+      />
 
       <p className="text-gray-500 mt-2">{authStore.userEmail}</p>
 
@@ -53,28 +47,36 @@ const ProfileInfo: React.FC = observer(() => {
             onChange={(e) => setNewName(e.target.value)}
             className="border p-2 rounded w-full max-w-xs"
           />
-          <button onClick={handleUpdateProfile} className="bg-blue-500 text-white px-4 py-2 rounded mt-2">
-            저장
-          </button>
+          <div className="flex justify-center space-x-2">
+            <button onClick={handleUpdateProfile} className="bg-blue-500 text-white px-4 py-2 rounded">
+              저장
+            </button>
+            <button onClick={() => setIsEditingName(false)} className="bg-gray-400 text-white px-4 py-2 rounded">
+              취소
+            </button>
+          </div>
         </div>
       ) : (
         <p className="text-lg font-semibold mt-4">{authStore.userName}</p>
       )}
 
-      <div className="mt-6">
-        <button
-          onClick={() => setIsEditingName(true)}
-          className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
-        >
-          ✏️ 이름 변경
-        </button>
-        <button
-          onClick={() => navigate("/change-password")}
-          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 ml-2"
-        >
-          🔒 비밀번호 변경
-        </button>
-      </div>
+      {!isEditingName && (
+        <div className="mt-6 flex flex-col sm:flex-row justify-center space-y-2 sm:space-y-0 sm:space-x-2">
+          <button
+            onClick={() => setIsEditingName(true)}
+            className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
+          >
+            ✏️ 이름 변경
+          </button>
+
+          <button
+            onClick={handleDeleteAccount}
+            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+          >
+            🚨 회원 탈퇴
+          </button>
+        </div>
+      )}
     </div>
   );
 });
