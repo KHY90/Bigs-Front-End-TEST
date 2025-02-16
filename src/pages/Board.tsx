@@ -35,6 +35,10 @@ const Board: React.FC = () => {
     fetchPosts();
   }, [fetchPosts]);
 
+  const handleDeletePost = async (postId: number) => {
+    await handleDelete(postId, setPosts);
+  };
+
   const categorizedPosts = posts.reduce((acc, post) => {
     acc[post.category] = acc[post.category] || [];
     if (acc[post.category].length < 3) acc[post.category].push(post);
@@ -87,9 +91,9 @@ const Board: React.FC = () => {
                           </button>
 
                           <button
-                            onClick={(e) => {
+                            onClick={async (e) => {
                               e.stopPropagation();
-                              handleDelete(post.id, setPosts);
+                              await handleDeletePost(post.id);
                             }}
                             className="text-red-500 hover:text-red-600 text-sm"
                           >

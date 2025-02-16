@@ -1,46 +1,44 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { observer } from "mobx-react-lite";
 import authStore from "../stores/authStore";
+import { DecodedToken, LoginForm } from "../types/types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-interface DecodedToken {
-  name: string;
-  exp: number;
-}
-
 const Login: React.FC = observer(() => {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ username: "", password: "" });
+  const [form, setForm] = useState<LoginForm>({ username: "", password: "" });
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/auth/signin`, form);
-      const { accessToken, refreshToken } = response.data;
-      if (!accessToken || !refreshToken) throw new Error("토큰이 반환되지 않았습니다.");
+      const { data } = await axios.post(`${API_BASE_URL}/auth/signin`, form);
+      const { accessToken, refreshToken } = data;
 
-      const decodedToken = jwtDecode<DecodedToken>(accessToken);
-      authStore.login(decodedToken.name, form.username, accessToken, refreshToken);
-
-      navigate("/main");
+      if (accessToken && refreshToken) {
+        const decodedToken = jwtDecode<DecodedToken>(accessToken);
+        authStore.login(decodedToken.name, form.username, accessToken, refreshToken);
+        navigate("/main");
+      } else {
+        throw new Error("토큰이 반환되지 않았습니다.");
+      }
     } catch (error) {
       console.error("로그인 실패:", error);
       alert("아이디 또는 비밀번호가 올바르지 않습니다.");
     } finally {
       setLoading(false);
     }
-  };
+  }, [form, navigate]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4 sm:p-6">

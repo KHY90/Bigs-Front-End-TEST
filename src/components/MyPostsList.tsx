@@ -23,16 +23,20 @@ const MyPostsList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOrder, setSortOrder] = useState<"latest" | "oldest">("latest");
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchMyPosts = async () => {
+      setLoading(true);
       try {
         const response = await fetchWithToken("/api/boards?page=0&size=50");
         setPosts(response.content || []);
         setFilteredPosts(response.content || []);
       } catch (error) {
         console.error("내가 작성한 글 불러오기 실패:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -61,62 +65,70 @@ const MyPostsList: React.FC = () => {
   const displayedPosts = sortedPosts.slice((currentPage - 1) * POSTS_PER_PAGE, currentPage * POSTS_PER_PAGE);
 
   const handleDeletePost = async (postId: number) => {
-    await handleDelete(postId, setPosts);
-    setFilteredPosts((prevFiltered) => prevFiltered.filter((post) => post.id !== postId));
+    if (!window.confirm("정말 이 게시글을 삭제하시겠습니까?")) return;
+    try {
+      await handleDelete(postId, setPosts);
+      setFilteredPosts((prevFiltered) => prevFiltered.filter((post) => post.id !== postId));
+    } catch (error) {
+      console.error("게시글 삭제 실패:", error);
+    }
   };
 
   return (
     <div className="min-h-screen p-4 sm:p-6 bg-white">
       <h1 className="text-2xl font-bold mb-4">📝 내가 작성한 글</h1>
 
-      {posts.length > 0 && (
-        <div className="mb-4 flex flex-col sm:flex-row justify-end items-center">
-          <SortDropdown sortOrder={sortOrder} setSortOrder={setSortOrder} />
-        </div>
-      )}
+      {loading ? (
+        <p className="text-gray-500 text-center">게시글을 불러오는 중...</p>
+      ) : posts.length > 0 ? (
+        <>
+          <div className="mb-4 flex flex-col sm:flex-row justify-end items-center">
+            <SortDropdown sortOrder={sortOrder} setSortOrder={setSortOrder} />
+          </div>
 
-      {filteredPosts.length === 0 ? (
-        <p className="text-gray-500 text-center">작성한 글이 없습니다.</p>
+          <ul className="space-y-3">
+            {displayedPosts.map((post) => (
+              <li
+                key={post.id}
+                className="bg-white p-4 rounded shadow flex justify-between items-center hover:bg-gray-50 transition"
+              >
+                <div className="cursor-pointer flex-1" onClick={() => navigate(`/detail/${post.id}`)}>
+                  <p className="text-xs text-blue-500 font-semibold mb-1">
+                    {categoryNames[post.category] || "카테고리 없음"}
+                  </p>
+                  <h2 className="font-semibold">{post.title}</h2>
+                  <p className="text-xs text-gray-500">{new Date(post.createdAt).toLocaleDateString()}</p>
+                </div>
+
+                <div className="flex space-x-2">
+                  <ScrapButton postId={post.id} />
+
+                  <button
+                    onClick={() => handleEdit(post.id, navigate)}
+                    className="text-yellow-500 hover:text-yellow-600 text-sm"
+                  >
+                    ✏️
+                  </button>
+
+                  <button
+                    onClick={() => handleDeletePost(post.id)}
+                    className="text-red-500 hover:text-red-600 text-sm"
+                  >
+                    🗑
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+
+          <div className="mt-4">
+            <SearchBar onSearch={handleSearch} />
+          </div>
+          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+        </>
       ) : (
-        <ul className="space-y-3">
-          {displayedPosts.map((post) => (
-            <li
-              key={post.id}
-              className="bg-white p-4 rounded shadow flex justify-between items-center hover:bg-gray-50 transition"
-            >
-              <div className="cursor-pointer flex-1" onClick={() => navigate(`/detail/${post.id}`)}>
-                <p className="text-xs text-blue-500 font-semibold mb-1">
-                  {categoryNames[post.category] || "카테고리 없음"}
-                </p>
-                <h2 className="font-semibold">{post.title}</h2>
-                <p className="text-xs text-gray-500">{new Date(post.createdAt).toLocaleDateString()}</p>
-              </div>
-
-              <div className="flex space-x-2">
-                <ScrapButton postId={post.id} />
-
-                <button
-                  onClick={() => handleEdit(post.id, navigate)}
-                  className="text-yellow-500 hover:text-yellow-600 text-sm"
-                >
-                  ✏️
-                </button>
-
-                <button
-                  onClick={() => handleDeletePost(post.id)}
-                  className="text-red-500 hover:text-red-600 text-sm"
-                >
-                  🗑
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
+        <p className="text-gray-500 text-center">작성한 글이 없습니다.</p>
       )}
-      <div className="mt-4">
-        <SearchBar onSearch={handleSearch} />
-      </div>
-      <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
     </div>
   );
 };

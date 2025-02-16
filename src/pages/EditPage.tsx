@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { observer } from "mobx-react-lite";
 import authStore from "../stores/authStore";
@@ -9,31 +9,31 @@ const EditPage: React.FC = observer(() => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
+  const fetchPostDetail = useCallback(async () => {
+    try {
+      const data = await fetchWithToken(`/api/boards/${id}`);
+      postStore.setTitle(data.title);
+      postStore.setCategory(data.boardCategory);
+      postStore.setContent(data.content);
+
+      if (data.imageUrl) {
+        postStore.preview = data.imageUrl.startsWith("http")
+          ? data.imageUrl
+          : `${import.meta.env.VITE_API_BASE_URL}${data.imageUrl}`;
+      }
+    } catch (error) {
+      console.error("게시글 불러오기 실패:", error);
+    }
+  }, [id]);
+
   useEffect(() => {
     if (!authStore.isAuthenticated) {
       alert("로그인이 필요합니다.");
       navigate("/signin");
+      return;
     }
-
-    const fetchPostDetail = async () => {
-      try {
-        const data = await fetchWithToken(`/api/boards/${id}`);
-        postStore.setTitle(data.title);
-        postStore.setCategory(data.boardCategory);
-        postStore.setContent(data.content);
-
-        if (data.imageUrl) {
-          postStore.preview = data.imageUrl.startsWith("http")
-            ? data.imageUrl
-            : `${import.meta.env.VITE_API_BASE_URL}${data.imageUrl}`;
-        }
-      } catch (error) {
-        console.error("게시글 불러오기 실패:", error);
-      }
-    };
-
     fetchPostDetail();
-  }, [id, navigate]);
+  }, [fetchPostDetail, navigate]);
 
   const handleSubmit = async () => {
     if (!postStore.title.trim() || !postStore.category || !postStore.content.trim()) {

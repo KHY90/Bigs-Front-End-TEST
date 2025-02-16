@@ -36,23 +36,24 @@ const PostPage: React.FC = observer(() => {
       alert("제목, 카테고리, 내용을 모두 입력해주세요.");
       return;
     }
-
+  
     if (!window.confirm("게시글을 등록하시겠습니까?")) return;
-
+  
     const formData = new FormData();
     const postData = { title, content, category };
+  
     formData.append("request", new Blob([JSON.stringify(postData)], { type: "application/json" }));
-
+  
     if (image) {
       formData.append("file", image);
     }
-
+  
     try {
       await fetchWithToken("/api/boards", {
         method: "POST",
         data: formData,
       });
-
+  
       alert("게시글이 등록되었습니다.");
       navigate(`/category/${category}`);
     } catch (error) {
@@ -60,6 +61,7 @@ const PostPage: React.FC = observer(() => {
       alert("게시글 등록 중 오류가 발생했습니다.");
     }
   };
+  
 
   const handleCancel = () => {
     if (window.confirm("게시글 작성을 취소하시겠습니까?")) {

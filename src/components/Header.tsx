@@ -13,16 +13,20 @@ const Header: React.FC = observer(() => {
   const [categories, setCategories] = useState<{ [key: string]: string }>({});
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isNavOpen, setIsNavOpen] = useState(false);
+  const [loading, setLoading] = useState(true); // 로딩 상태 추가
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const avatarRef = useRef<HTMLImageElement | null>(null);
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
+        setLoading(true);
         const data = await fetchWithToken(`/api/boards/categories`);
         setCategories(data);
       } catch (error) {
         console.error("카테고리 가져오기 실패:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -44,9 +48,9 @@ const Header: React.FC = observer(() => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     if (window.confirm("정말 로그아웃 하시겠습니까?")) {
-      clearAuth();
+      await clearAuth(); // 혹시 비동기 처리 필요할 경우 대비
       navigate("/signin");
     }
   };
@@ -69,17 +73,21 @@ const Header: React.FC = observer(() => {
         </button>
 
         <nav className="hidden md:flex space-x-4 text-gray-700">
-          {Object.entries(categories).map(([key, label]) => (
-            <button
-              key={key}
-              className={`font-semibold hover:underline hover:text-blue-600 ${
-                location.pathname.includes(`/category/${key}`) ? "text-blue-600 underline" : ""
-              }`}
-              onClick={() => navigate(`/category/${key}`)}
-            >
-              {label}
-            </button>
-          ))}
+          {loading ? (
+            <span className="text-gray-400">로딩 중...</span>
+          ) : (
+            Object.entries(categories).map(([key, label]) => (
+              <button
+                key={key}
+                className={`font-semibold hover:underline hover:text-blue-600 ${
+                  location.pathname.includes(`/category/${key}`) ? "text-blue-600 underline" : ""
+                }`}
+                onClick={() => navigate(`/category/${key}`)}
+              >
+                {label}
+              </button>
+            ))
+          )}
         </nav>
       </div>
 
@@ -96,18 +104,22 @@ const Header: React.FC = observer(() => {
             >
               ✕
             </button>
-            {Object.entries(categories).map(([key, label]) => (
-              <button
-                key={key}
-                className="text-left hover:bg-gray-100 p-2 rounded"
-                onClick={() => {
-                  setIsNavOpen(false);
-                  navigate(`/category/${key}`);
-                }}
-              >
-                {label}
-              </button>
-            ))}
+            {loading ? (
+              <span className="text-gray-400">로딩 중...</span>
+            ) : (
+              Object.entries(categories).map(([key, label]) => (
+                <button
+                  key={key}
+                  className="text-left hover:bg-gray-100 p-2 rounded"
+                  onClick={() => {
+                    setIsNavOpen(false);
+                    navigate(`/category/${key}`);
+                  }}
+                >
+                  {label}
+                </button>
+              ))
+            )}
           </nav>
         </>
       )}

@@ -1,17 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { BlogPost } from "../types/types";
+import { BlogPost, BannerPost } from "../types/types";
+import { fetchWithToken } from "../utils/fetchWithToken";
 
 interface BannerProps {
-  posts: BlogPost[];
   loading: boolean;
-}
-
-interface BannerPost {
-  id: string;
-  title: string;
-  category: string;
-  imageUrl?: string;
 }
 
 const categoryNames: Record<string, string> = {
@@ -21,17 +14,34 @@ const categoryNames: Record<string, string> = {
   ETC: "기타",
 };
 
-const Banner: React.FC<BannerProps> = ({ posts, loading }) => {
+const Banner: React.FC<BannerProps> = ({ loading }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [categoryPosts, setCategoryPosts] = useState<BannerPost[]>([]);
   const navigate = useNavigate();
 
-  const categoryPosts: BannerPost[] = Object.keys(categoryNames).map((category) => {
-    const post = posts.find((post) => post.category === category);
-    return post
-      ? { id: post.id.toString(), title: post.title, category: post.category, imageUrl: post.imageUrl }
-      : { id: `${category}-no-post`, title: "아직 등록된 게시물이 없습니다.", category, imageUrl: "/image/banner.png" };
-  });
+  // 게시물 배너 불러오기 요청
+  useEffect(() => {
+    const fetchBannerPosts = async () => {
+      try {
+        const response = await fetchWithToken(`/api/boards`);
+        const fetchedPosts: BlogPost[] = response.content || [];
 
+        const categorizedPosts: BannerPost[] = Object.keys(categoryNames).map((category) => {
+          const post = fetchedPosts.find((post) => post.category === category);
+          return post
+            ? { id: post.id.toString(), title: post.title, category: post.category, imageUrl: post.imageUrl }
+            : { id: `${category}-no-post`, title: "아직 등록된 게시물이 없습니다.", category, imageUrl: "/image/banner.png" };
+        });
+
+        setCategoryPosts(categorizedPosts);
+      } catch (error) {
+        console.error("배너 데이터 불러오기 실패:", error);
+      }
+    };
+
+    fetchBannerPosts();
+  }, []);
+  // 슬라이드(5초)
   useEffect(() => {
     if (categoryPosts.length > 0) {
       const interval = setInterval(() => {
@@ -46,9 +56,7 @@ const Banner: React.FC<BannerProps> = ({ posts, loading }) => {
   }
 
   return (
-    <div className="relative bg-white shadow-lg rounded mb-3 flex items-center justify-center overflow-hidden
-  h-40 sm:h-48 md:h-56 lg:h-64 xl:h-72">
-
+    <div className="relative bg-white shadow-lg rounded mb-3 flex items-center justify-center overflow-hidden h-40 sm:h-48 md:h-56 lg:h-64 xl:h-72">
       {categoryPosts.length > 0 && (
         <>
           <div
@@ -60,7 +68,9 @@ const Banner: React.FC<BannerProps> = ({ posts, loading }) => {
               backgroundPosition: "center",
               filter: "brightness(90%)",
             }}
-            onClick={() => categoryPosts[currentIndex].id.includes("-no-post") || navigate(`/detail/${categoryPosts[currentIndex].id}`)}
+            onClick={() =>
+              categoryPosts[currentIndex].id.includes("-no-post") || navigate(`/detail/${categoryPosts[currentIndex].id}`)
+            }
           >
             <div className="absolute top-4 left-4 text-white bg-black bg-opacity-50 px-3 py-1 rounded text-sm sm:text-base">
               {categoryNames[categoryPosts[currentIndex].category] || "카테고리 없음"}

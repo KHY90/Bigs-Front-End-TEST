@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { fetchWithToken } from "../utils/fetchWithToken";
 import { BlogPost } from "../types/types";
@@ -21,49 +21,56 @@ const CategoryPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortOrder, setSortOrder] = useState<"latest" | "oldest">("latest");
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const data = await fetchWithToken(`/api/boards?page=0&size=50`);
-        if (Array.isArray(data.content)) {
-          const formattedCategory = category?.toUpperCase();
-          const filtered = data.content.filter((post: { category: string | undefined; }) => post.category === formattedCategory);
-          setPosts(filtered);
-          setFilteredPosts(filtered);
-        } else {
-          console.error("잘못된 응답 형식:", data);
-          setPosts([]);
-          setFilteredPosts([]);
-        }
-      } catch (error) {
-        console.error("게시글 가져오기 실패:", error);
-      } finally {
-        setLoading(false);
+  const fetchPosts = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await fetchWithToken(`/api/boards?page=0&size=50`);
+      if (Array.isArray(data.content)) {
+        const formattedCategory = category?.toUpperCase();
+        const filtered = data.content.filter((post: { category: string | undefined; }) => post.category === formattedCategory);
+        setPosts(filtered);
+        setFilteredPosts(filtered);
+      } else {
+        console.error("잘못된 응답 형식:", data);
+        setPosts([]);
+        setFilteredPosts([]);
       }
-    };
-
-    fetchPosts();
+    } catch (error) {
+      console.error("게시글 가져오기 실패:", error);
+    } finally {
+      setLoading(false);
+    }
   }, [category]);
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const data = await fetchWithToken(`/api/boards/categories`);
-        setCategories(data);
-      } catch (error) {
-        console.error("카테고리 가져오기 실패:", error);
-      }
-    };
-
-    fetchCategories();
+  const fetchCategories = useCallback(async () => {
+    try {
+      const data = await fetchWithToken(`/api/boards/categories`);
+      setCategories(data);
+    } catch (error) {
+      console.error("카테고리 가져오기 실패:", error);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchPosts();
+  }, [fetchPosts]);
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
+
+  const handleDeletePost = async (postId: number) => {
+    await handleDelete(postId, setPosts);
+    setFilteredPosts((prevFiltered) => prevFiltered.filter((post) => post.id !== postId));
+  };
 
   const handleSearch = (query: string) => {
     if (query.trim() === "") {
       setFilteredPosts(posts);
     } else {
-      const filtered = posts.filter((post) => post.title.toLowerCase().includes(query.toLowerCase()));
-      setFilteredPosts(filtered);
+      setFilteredPosts(
+        posts.filter((post) => post.title.toLowerCase().includes(query.toLowerCase()))
+      );
     }
     setCurrentPage(1);
   };
@@ -79,7 +86,6 @@ const CategoryPage: React.FC = () => {
         <h1 className="text-xl sm:text-2xl font-bold">{categories[category || ""] || "게시판"}</h1>
         <SortDropdown sortOrder={sortOrder} setSortOrder={setSortOrder} />
       </div>
-
 
       <div className="flex-grow">
         {loading ? (
@@ -113,9 +119,9 @@ const CategoryPage: React.FC = () => {
                   </button>
 
                   <button
-                    onClick={(e) => {
+                    onClick={async (e) => {
                       e.stopPropagation();
-                      handleDelete(post.id, setPosts);
+                      await handleDeletePost(post.id);
                     }}
                     className="text-red-500 hover:text-red-600 text-sm"
                   >
@@ -127,8 +133,9 @@ const CategoryPage: React.FC = () => {
           </div>
         )}
       </div>
+
       <div className="mt-6">
-      <SearchBar onSearch={handleSearch} />
+        <SearchBar onSearch={handleSearch} />
       </div>
 
       <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />

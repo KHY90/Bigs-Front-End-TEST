@@ -2,15 +2,9 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { validateEmail, validatePassword, validatePasswordMatch } from "../utils/validation";
+import { SignUpForm } from "../types/types"; 
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
-interface SignUpForm {
-  username: string;
-  name: string;
-  password: string;
-  confirmPassword: string;
-}
 
 const SignUp: React.FC = () => {
   const navigate = useNavigate();
@@ -23,6 +17,7 @@ const SignUp: React.FC = () => {
   });
 
   const [errors, setErrors] = useState<Partial<SignUpForm>>({});
+  const [loading, setLoading] = useState(false); 
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -36,7 +31,6 @@ const SignUp: React.FC = () => {
     if (!window.confirm("회원가입을 완료하시겠습니까?")) return;
 
     const tempErrors: Partial<SignUpForm> = {};
-
     if (!validateEmail(form.username)) tempErrors.username = "유효한 이메일 형식이 아닙니다.";
     if (!form.name.trim()) tempErrors.name = "이름을 입력해주세요.";
     if (!validatePassword(form.password)) tempErrors.password = "비밀번호 형식이 맞지 않습니다.";
@@ -45,6 +39,7 @@ const SignUp: React.FC = () => {
     setErrors(tempErrors);
     if (Object.keys(tempErrors).length > 0) return;
 
+    setLoading(true);
     try {
       await axios.post(`${API_BASE_URL}/auth/signup`, form);
       alert("회원가입이 완료되었습니다.");
@@ -52,6 +47,8 @@ const SignUp: React.FC = () => {
     } catch (error) {
       console.error("회원가입 실패:", error);
       alert("회원가입 중 오류가 발생했습니다.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -76,76 +73,68 @@ const SignUp: React.FC = () => {
       <form onSubmit={handleSubmit} className="w-full max-w-sm sm:max-w-md bg-white p-6 sm:p-8 rounded shadow-lg">
         <div className="mb-3 sm:mb-4">
           <label className="block text-gray-700 text-sm sm:text-base">아이디</label>
-          <div className="relative">
-            <span className="absolute inset-y-0 left-3 flex items-center text-gray-500 text-sm sm:text-base">📧</span>
-            <input
-              type="email"
-              name="username"
-              value={form.username}
-              onChange={handleChange}
-              className="pl-12 sm:pl-14 w-full p-2 sm:p-3 border border-gray-300 rounded text-sm sm:text-base"
-              placeholder="이메일을 입력하세요"
-              required
-            />
-          </div>
+          <input
+            type="email"
+            name="username"
+            value={form.username}
+            onChange={handleChange}
+            className="w-full p-2 sm:p-3 border border-gray-300 rounded text-sm sm:text-base"
+            placeholder="이메일을 입력하세요"
+            required
+          />
           {errors.username && <p className="text-red-500 text-xs sm:text-sm">{errors.username}</p>}
         </div>
 
         <div className="mb-3 sm:mb-4">
           <label className="block text-gray-700 text-sm sm:text-base">이름</label>
-          <div className="relative">
-            <span className="absolute inset-y-0 left-3 flex items-center text-gray-500 text-sm sm:text-base">👤</span>
-            <input
-              type="text"
-              name="name"
-              value={form.name}
-              onChange={handleChange}
-              className="pl-12 sm:pl-14 w-full p-2 sm:p-3 border border-gray-300 rounded text-sm sm:text-base"
-              placeholder="이름을 입력하세요"
-              required
-            />
-          </div>
+          <input
+            type="text"
+            name="name"
+            value={form.name}
+            onChange={handleChange}
+            className="w-full p-2 sm:p-3 border border-gray-300 rounded text-sm sm:text-base"
+            placeholder="이름을 입력하세요"
+            required
+          />
           {errors.name && <p className="text-red-500 text-xs sm:text-sm">{errors.name}</p>}
         </div>
 
         <div className="mb-3 sm:mb-4">
           <label className="block text-gray-700 text-sm sm:text-base">비밀번호</label>
-          <div className="relative">
-            <span className="absolute inset-y-0 left-3 flex items-center text-gray-500 text-sm sm:text-base">🔒</span>
-            <input
-              type="password"
-              name="password"
-              value={form.password}
-              onChange={handleChange}
-              className="pl-12 sm:pl-14 w-full p-2 sm:p-3 border border-gray-300 rounded text-sm sm:text-base"
-              placeholder="비밀번호를 입력하세요"
-              required
-            />
-          </div>
+          <input
+            type="password"
+            name="password"
+            value={form.password}
+            onChange={handleChange}
+            className="w-full p-2 sm:p-3 border border-gray-300 rounded text-sm sm:text-base"
+            placeholder="비밀번호를 입력하세요"
+            required
+          />
           <p className="text-xs sm:text-sm text-gray-500 mt-1">8자 이상, 영문, 숫자, 특수문자를 포함해주세요.</p>
           {errors.password && <p className="text-red-500 text-xs sm:text-sm">{errors.password}</p>}
         </div>
 
         <div className="mb-5 sm:mb-6">
           <label className="block text-gray-700 text-sm sm:text-base">비밀번호 확인</label>
-          <div className="relative">
-            <span className="absolute inset-y-0 left-3 flex items-center text-gray-500 text-sm sm:text-base">🔒</span>
-            <input
-              type="password"
-              name="confirmPassword"
-              value={form.confirmPassword}
-              onChange={handleChange}
-              className="pl-12 sm:pl-14 w-full p-2 sm:p-3 border border-gray-300 rounded text-sm sm:text-base"
-              placeholder="비밀번호를 한번 더 입력하세요"
-              required
-            />
-          </div>
+          <input
+            type="password"
+            name="confirmPassword"
+            value={form.confirmPassword}
+            onChange={handleChange}
+            className="w-full p-2 sm:p-3 border border-gray-300 rounded text-sm sm:text-base"
+            placeholder="비밀번호를 한번 더 입력하세요"
+            required
+          />
           {errors.confirmPassword && <p className="text-red-500 text-xs sm:text-sm">{errors.confirmPassword}</p>}
         </div>
 
         <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-          <button type="submit" className="w-full sm:w-1/2 bg-blue-500 text-white p-2 rounded hover:bg-blue-600 text-sm sm:text-base">
-            가입하기
+          <button
+            type="submit"
+            className="w-full sm:w-1/2 bg-blue-500 text-white p-2 rounded hover:bg-blue-600 text-sm sm:text-base"
+            disabled={loading} 
+          >
+            {loading ? "가입 중..." : "가입하기"}
           </button>
           <button
             type="button"

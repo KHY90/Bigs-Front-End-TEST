@@ -1,11 +1,5 @@
 import React, { useEffect, useState } from "react";
-
-interface Comment {
-  id: number;
-  postId: number;
-  content: string;
-  createdAt: string;
-}
+import { Comment } from "../types/types";
 
 interface CommentSectionProps {
   postId: number;
@@ -18,18 +12,21 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
   const [editContent, setEditContent] = useState("");
 
   useEffect(() => {
-    const storedComments = sessionStorage.getItem(`comments_${postId}`);
-    if (storedComments) {
-      setComments(JSON.parse(storedComments));
-    }
+    const fetchComments = async () => {
+      const storedComments = await sessionStorage.getItem(`comments_${postId}`);
+      if (storedComments) {
+        setComments(JSON.parse(storedComments));
+      }
+    };
+    fetchComments();
   }, [postId]);
 
-  const saveCommentsToStorage = (updatedComments: Comment[]) => {
+  const saveCommentsToStorage = async (updatedComments: Comment[]) => {
     setComments(updatedComments);
     sessionStorage.setItem(`comments_${postId}`, JSON.stringify(updatedComments));
   };
 
-  const handleAddComment = () => {
+  const handleAddComment = async () => {
     if (!newComment.trim()) return;
 
     const comment: Comment = {
@@ -39,7 +36,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
       createdAt: new Date().toISOString(),
     };
 
-    saveCommentsToStorage([...comments, comment]);
+    await saveCommentsToStorage([...comments, comment]);
     setNewComment("");
   };
 
@@ -48,20 +45,20 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
     setEditContent(content);
   };
 
-  const handleUpdateComment = () => {
+  const handleUpdateComment = async () => {
     if (!editContent.trim()) return;
     const updatedComments = comments.map((comment) =>
       comment.id === editingCommentId ? { ...comment, content: editContent } : comment
     );
 
-    saveCommentsToStorage(updatedComments);
+    await saveCommentsToStorage(updatedComments);
     setEditingCommentId(null);
     setEditContent("");
   };
 
-  const handleDeleteComment = (id: number) => {
+  const handleDeleteComment = async (id: number) => {
     if (!window.confirm("정말 이 댓글을 삭제하시겠습니까?")) return;
-    saveCommentsToStorage(comments.filter((comment) => comment.id !== id));
+    await saveCommentsToStorage(comments.filter((comment) => comment.id !== id));
   };
 
   return (

@@ -1,19 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import authStore from "../stores/authStore";
 import { observer } from "mobx-react-lite";
 import CommentSection from "../components/CommentSection";
-
-interface BlogDetail {
-  id: number;
-  title: string;
-  content: string;
-  boardCategory: string;
-  imageUrl?: string;
-  createdAt: string;
-  author: string;
-}
+import { BlogDetail } from "../types/types";
 
 const categoryNames: Record<string, string> = {
   NOTICE: "공지",
@@ -29,20 +20,20 @@ const DetailPage: React.FC = observer(() => {
   const [post, setPost] = useState<BlogDetail | null>(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchPostDetail = async () => {
-      try {
-        const response = await axios.get(`/api/boards/${id}`, {
-          headers: { Authorization: `Bearer ${authStore.accessToken}` },
-        });
-        setPost(response.data);
-      } catch (error) {
-        console.error("게시글 상세 불러오기 실패:", error);
-      }
-    };
-
-    fetchPostDetail();
+  const fetchPostDetail = useCallback(async () => {
+    try {
+      const response = await axios.get(`/api/boards/${id}`, {
+        headers: { Authorization: `Bearer ${authStore.accessToken}` },
+      });
+      setPost(response.data);
+    } catch (error) {
+      console.error("게시글 상세 불러오기 실패:", error);
+    }
   }, [id]);
+
+  useEffect(() => {
+    fetchPostDetail();
+  }, [fetchPostDetail]);
 
   if (!post) {
     return (
@@ -85,7 +76,7 @@ const DetailPage: React.FC = observer(() => {
               &lt;
             </button>
             <span className="text-gray-600 text-sm sm:text-base">
-              {categoryNames[post.boardCategory] || "카테고리 없음"}
+              {categoryNames[post.category] || "카테고리 없음"}
             </span>
           </div>
           <div className="flex space-x-2">
